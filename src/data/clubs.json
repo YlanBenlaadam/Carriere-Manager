@@ -1,0 +1,406 @@
+[
+  {
+    "id": "psg",
+    "nom": "Paris Saint-Germain",
+    "championnat": "France",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#0B1F4D", "secondaire": "#DA291C" }
+  },
+  {
+    "id": "marseille",
+    "nom": "Olympique de Marseille",
+    "championnat": "France",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#2FAEE0", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "monaco",
+    "nom": "AS Monaco",
+    "championnat": "France",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#CE1126", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "lyon",
+    "nom": "Olympique Lyonnais",
+    "championnat": "France",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#1B3C8B", "secondaire": "#E01A2B" }
+  },
+  {
+    "id": "lille",
+    "nom": "LOSC Lille",
+    "championnat": "France",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#D1001F", "secondaire": "#0A2342" }
+  },
+  {
+    "id": "rennes",
+    "nom": "Stade Rennais",
+    "championnat": "France",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#E23838", "secondaire": "#0A0A0A" }
+  },
+  {
+    "id": "nice",
+    "nom": "OGC Nice",
+    "championnat": "France",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#C8102E", "secondaire": "#000000" }
+  },
+  {
+    "id": "lens",
+    "nom": "RC Lens",
+    "championnat": "France",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#FFD100", "secondaire": "#D1001F" }
+  },
+  {
+    "id": "reims",
+    "nom": "Stade de Reims",
+    "championnat": "France",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#D81E05", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "nantes",
+    "nom": "FC Nantes",
+    "championnat": "France",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#FCD116", "secondaire": "#008A4B" }
+  },
+
+  {
+    "id": "man-city",
+    "nom": "Manchester City",
+    "championnat": "Angleterre",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#6CABDD", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "liverpool",
+    "nom": "Liverpool FC",
+    "championnat": "Angleterre",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#C8102E", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "arsenal",
+    "nom": "Arsenal FC",
+    "championnat": "Angleterre",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#EF0107", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "man-united",
+    "nom": "Manchester United",
+    "championnat": "Angleterre",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#DA291C", "secondaire": "#000000" }
+  },
+  {
+    "id": "chelsea",
+    "nom": "Chelsea FC",
+    "championnat": "Angleterre",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#034694", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "tottenham",
+    "nom": "Tottenham Hotspur",
+    "championnat": "Angleterre",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#132257", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "newcastle",
+    "nom": "Newcastle United",
+    "championnat": "Angleterre",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#241F20", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "aston-villa",
+    "nom": "Aston Villa",
+    "championnat": "Angleterre",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#670E36", "secondaire": "#95BFE5" }
+  },
+  {
+    "id": "brighton",
+    "nom": "Brighton & Hove Albion",
+    "championnat": "Angleterre",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#0057B8", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "everton",
+    "nom": "Everton FC",
+    "championnat": "Angleterre",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#003399", "secondaire": "#FFFFFF" }
+  },
+
+  {
+    "id": "real-madrid",
+    "nom": "Real Madrid",
+    "championnat": "Espagne",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#00529F", "secondaire": "#FEBE10" }
+  },
+  {
+    "id": "barcelona",
+    "nom": "FC Barcelone",
+    "championnat": "Espagne",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#A50044", "secondaire": "#004D98" }
+  },
+  {
+    "id": "atletico-madrid",
+    "nom": "Atlético de Madrid",
+    "championnat": "Espagne",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#CB3524", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "sevilla",
+    "nom": "Séville FC",
+    "championnat": "Espagne",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#D4011D", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "real-sociedad",
+    "nom": "Real Sociedad",
+    "championnat": "Espagne",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#0067B1", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "villarreal",
+    "nom": "Villarreal CF",
+    "championnat": "Espagne",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#FFD500", "secondaire": "#004C9E" }
+  },
+  {
+    "id": "real-betis",
+    "nom": "Real Betis",
+    "championnat": "Espagne",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#00954C", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "athletic-bilbao",
+    "nom": "Athletic Bilbao",
+    "championnat": "Espagne",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#EE2523", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "valencia",
+    "nom": "Valence CF",
+    "championnat": "Espagne",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#F7A500", "secondaire": "#000000" }
+  },
+  {
+    "id": "celta",
+    "nom": "RC Celta de Vigo",
+    "championnat": "Espagne",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#6AA5D6", "secondaire": "#FFFFFF" }
+  },
+
+  {
+    "id": "inter",
+    "nom": "Inter Milan",
+    "championnat": "Italie",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#0B1560", "secondaire": "#000000" }
+  },
+  {
+    "id": "juventus",
+    "nom": "Juventus",
+    "championnat": "Italie",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#1A1A1A", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "milan",
+    "nom": "AC Milan",
+    "championnat": "Italie",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#FB090B", "secondaire": "#000000" }
+  },
+  {
+    "id": "napoli",
+    "nom": "SSC Naples",
+    "championnat": "Italie",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#12A0D7", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "roma",
+    "nom": "AS Rome",
+    "championnat": "Italie",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#8E1F2F", "secondaire": "#F0BC42" }
+  },
+  {
+    "id": "atalanta",
+    "nom": "Atalanta Bergame",
+    "championnat": "Italie",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#1E71B8", "secondaire": "#000000" }
+  },
+  {
+    "id": "lazio",
+    "nom": "Lazio Rome",
+    "championnat": "Italie",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#4BA3D3", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "fiorentina",
+    "nom": "ACF Fiorentina",
+    "championnat": "Italie",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#5E2E86", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "bologna",
+    "nom": "Bologne FC",
+    "championnat": "Italie",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#A21C23", "secondaire": "#1A2F58" }
+  },
+  {
+    "id": "torino",
+    "nom": "Torino FC",
+    "championnat": "Italie",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#881600", "secondaire": "#FFFFFF" }
+  },
+
+  {
+    "id": "bayern",
+    "nom": "Bayern Munich",
+    "championnat": "Allemagne",
+    "prestige": 100,
+    "budget": 300,
+    "couleurs": { "principale": "#DC052D", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "dortmund",
+    "nom": "Borussia Dortmund",
+    "championnat": "Allemagne",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#FDE100", "secondaire": "#000000" }
+  },
+  {
+    "id": "leipzig",
+    "nom": "RB Leipzig",
+    "championnat": "Allemagne",
+    "prestige": 78,
+    "budget": 120,
+    "couleurs": { "principale": "#DD0741", "secondaire": "#001F47" }
+  },
+  {
+    "id": "leverkusen",
+    "nom": "Bayer Leverkusen",
+    "championnat": "Allemagne",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#E32221", "secondaire": "#000000" }
+  },
+  {
+    "id": "frankfurt",
+    "nom": "Eintracht Francfort",
+    "championnat": "Allemagne",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#E1000F", "secondaire": "#000000" }
+  },
+  {
+    "id": "stuttgart",
+    "nom": "VfB Stuttgart",
+    "championnat": "Allemagne",
+    "prestige": 62,
+    "budget": 60,
+    "couleurs": { "principale": "#E32219", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "wolfsburg",
+    "nom": "VfL Wolfsbourg",
+    "championnat": "Allemagne",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#65B32E", "secondaire": "#FFFFFF" }
+  },
+  {
+    "id": "gladbach",
+    "nom": "Borussia Mönchengladbach",
+    "championnat": "Allemagne",
+    "prestige": 48,
+    "budget": 30,
+    "couleurs": { "principale": "#00843D", "secondaire": "#000000" }
+  },
+  {
+    "id": "freiburg",
+    "nom": "SC Fribourg",
+    "championnat": "Allemagne",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#E2001A", "secondaire": "#000000" }
+  },
+  {
+    "id": "bremen",
+    "nom": "Werder Brême",
+    "championnat": "Allemagne",
+    "prestige": 36,
+    "budget": 18,
+    "couleurs": { "principale": "#1D9053", "secondaire": "#FFFFFF" }
+  }
+]
