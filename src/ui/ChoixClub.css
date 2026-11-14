@@ -1,0 +1,85 @@
+/* Écran de choix du club. Rappel : les var(--...) sont les variables définies
+   dans index.css (couleurs, espacements...). */
+
+.choix-club {
+  max-width: 1000px; /* on empêche la page de s'étaler trop large sur grand écran */
+  margin: 0 auto; /* "0 auto" = 0 en haut/bas, "auto" à gauche/droite → centré */
+  padding: var(--esp-6) var(--esp-4); /* 2 valeurs : haut/bas (32px), gauche/droite (16px) */
+}
+
+.choix-club__titre {
+  text-align: center;
+}
+
+.choix-club__intro {
+  text-align: center;
+  color: var(--texte-doux);
+  margin-top: var(--esp-2);
+  margin-bottom: var(--esp-6);
+}
+
+/* Un bloc par championnat. */
+.championnat {
+  margin-bottom: var(--esp-6);
+}
+
+.championnat__nom {
+  margin-bottom: var(--esp-4);
+  padding-bottom: var(--esp-2);
+  /* border-bottom : un trait sous le titre. 3 valeurs : épaisseur (1px),
+     style (solid = trait plein), couleur (notre bordure discrète). */
+  border-bottom: 1px solid var(--bordure);
+}
+
+/* CSS GRID : display:grid découpe la zone en colonnes et lignes.
+   grid-template-columns décrit les colonnes. Ici :
+     repeat(auto-fill, minmax(180px, 1fr))
+       - auto-fill : crée AUTOMATIQUEMENT autant de colonnes qu'il y a de place
+       - minmax(180px, 1fr) : chaque colonne fait AU MOINS 180px et AU PLUS 1fr
+         (1fr = 1 "part" de l'espace restant, les parts se répartissant à égalité)
+   Résultat : le nombre de colonnes s'adapte tout seul à la largeur → responsive
+   sans écrire de media queries. */
+.championnat__grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--esp-3); /* espace entre les cartes, horizontalement ET verticalement */
+}
+
+/* Une carte de club. C'est un <button>, donc on redéfinit son look pour en faire
+   une vraie petite carte (le style bouton global est écrasé ici). */
+.carte-club {
+  display: flex;
+  flex-direction: column; /* pastille, nom, étoiles empilés verticalement */
+  align-items: center; /* centrés horizontalement */
+  gap: var(--esp-2);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--esp-4);
+  text-align: center;
+}
+/* :hover = quand la souris passe dessus. On signale que la carte est sélectionnable. */
+.carte-club:hover {
+  background: var(--surface-2);
+  border-color: var(--accent); /* liseré vert */
+}
+
+/* La pastille : un cercle aux couleurs du club.
+   width = height, puis border-radius:50% arrondit à fond → un cercle parfait.
+   La bordure (3px) montre la 2e couleur ; sa COULEUR est posée en style inline. */
+.carte-club__pastille {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid; /* épaisseur + style ; la couleur vient du JSX (secondaire) */
+}
+
+.carte-club__nom {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.carte-club__etoiles {
+  color: var(--or); /* étoiles dorées */
+  letter-spacing: 2px; /* un peu d'espace entre les étoiles pour la lisibilité */
+}

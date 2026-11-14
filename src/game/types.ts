@@ -234,12 +234,23 @@ export interface Trophee {
 /** Le palmarès = la liste des trophées accumulés sur toute la carrière. */
 export type Palmares = Trophee[]
 
+/** Les statistiques individuelles d'un match : la note de chaque joueur, et qui
+ *  a marqué / fait une passe décisive. Chaque Record associe un id de joueur à
+ *  un nombre (note /10, nombre de buts, nombre de passes). */
+export interface StatsMatch {
+  notes: Record<string, number> // id du joueur → sa note /10
+  buteurs: Record<string, number> // id du joueur → nombre de buts marqués
+  passeurs: Record<string, number> // id du joueur → nombre de passes décisives
+}
+
 /** Résultat d'un match clé, du point de vue de NOTRE équipe. */
 export interface MatchResult {
   butsPour: number
   butsContre: number
   pronostic: Pronostic
   notes: Record<string, number> // clé = Player.id, valeur = note /10 du match
+  buteurs: Record<string, number> // id du joueur → nombre de buts
+  passeurs: Record<string, number> // id du joueur → nombre de passes décisives
 }
 
 // ----------------------------------------------------------------------------

@@ -1,111 +1,141 @@
+/* ==========================================================================
+   FONDATIONS DE DESIGN — thème sombre & moderne.
+   Ce fichier définit :
+     1. les "tokens" = variables CSS (couleurs, espacements, typo, arrondis...)
+     2. un reset léger (base neutre et identique entre navigateurs)
+     3. les styles de base des éléments (body, titres, boutons...)
+   Tout le CSS des écrans réutilisera ces variables → cohérence garantie.
+   Pour changer l'ambiance plus tard, tu modifies surtout les variables ici.
+   ========================================================================== */
+
+/* ":root" = la racine du document (toute la page). Les "variables CSS" déclarées
+   ici (celles qui commencent par "--") sont des RÉGLAGES RÉUTILISABLES : on écrit
+   une valeur une seule fois, puis on la rappelle partout avec var(--nom).
+   Exemple : --fond vaut #0e1116, et ailleurs on écrira "background: var(--fond)".
+   Intérêt : changer la couleur ICI la change PARTOUT d'un coup, et le code se lit
+   ("var(--accent)" est plus parlant que "#22c55e" perdu au milieu du CSS). */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* --- Couleurs (chaque variable = un rôle précis, pas une couleur "en vrac") --- */
+  --fond: #0e1116; /* fond général (très sombre) */
+  --surface: #171b22; /* cartes / panneaux (un cran plus clair que le fond) */
+  --surface-2: #1f242d; /* survol / éléments imbriqués */
+  --bordure: #2a313c; /* liserés discrets entre zones */
+  --texte: #e6e9ee; /* texte principal */
+  --texte-doux: #9aa4b1; /* texte secondaire (labels, légendes) */
+  --accent: #22c55e; /* couleur d'accent (vert "pelouse") */
+  --accent-fonce: #16a34a; /* accent au survol / pressé */
+  /* rgba() = une couleur AVEC transparence. Les 4 valeurs : Rouge, Vert, Bleu
+     (0 à 255 chacune) puis l'opacité (0 = invisible, 1 = opaque). Ici 0.12 =
+     12% d'opacité → un vert à peine visible, parfait pour un fond légèrement teinté. */
+  --accent-doux: rgba(34, 197, 94, 0.12); /* fond très léger aux teintes d'accent */
+  --danger: #ef4444; /* alertes (jauge basse, défaite...) */
+  --or: #fbbf24; /* étoiles de prestige / trophées */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* --- Espacements : une échelle en multiples de 4px, pour des marges
+         cohérentes partout (on n'invente pas des valeurs au hasard). --- */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 32px;
+  --esp-7: 48px;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* --- Arrondis --- */
+  --rayon: 14px;
+  --rayon-sm: 9px;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* --- Ombre portée (sera utilisée plus tard via "box-shadow: var(--ombre)").
+     box-shadow projette une ombre DERRIÈRE un élément (différent de text-shadow
+     qui n'ombre que le texte). Ses 4 valeurs ici :
+       0     = décalage horizontal (0 = pas décalée à gauche/droite)
+       8px   = décalage vertical (l'ombre tombe 8px plus bas → effet "soulevé")
+       24px  = flou (plus c'est grand, plus l'ombre est diffuse/douce)
+       rgba(0,0,0,0.35) = couleur de l'ombre : noir à 35% d'opacité --- */
+  --ombre: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* --- Typographie --- */
+  --police: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  color-scheme: dark; /* indique au navigateur qu'on est en thème sombre */
+  color: var(--texte); /* couleur de texte héritée par tout le document */
+  font-family: var(--police);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased; /* rendu de police plus net */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+/* --- Reset léger --- */
+/* box-sizing: border-box → la largeur d'un élément INCLUT son padding et sa
+   bordure. Ça rend les calculs de tailles beaucoup plus simples et prévisibles. */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+/* Les navigateurs ajoutent des marges par défaut (body, titres, p...). On les
+   remet à zéro pour tout maîtriser nous-mêmes avec gap/padding. */
+* {
+  margin: 0;
 }
 
 body {
-  margin: 0;
+  background: var(--fond);
+  min-height: 100vh; /* le fond couvre toute la hauteur de l'écran */
 }
 
+/* Une image ne déborde jamais de son conteneur. display:block évite un petit
+   espace sous les images (dû au comportement "inline" par défaut). */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* --- Styles de base des éléments --- */
 h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+h2,
+h3 {
+  color: var(--texte);
+  line-height: 1.2; /*espacement vertical entre les lignes du titre, plus serré que le texte normal (1.5) */
+  font-weight: 700;/* gras = plus lisible pour les titres */
 }
-
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
+  font-size: 2rem;
+} /* 32px (1rem = 16px, la taille de base définie plus haut) */
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  font-size: 1.4rem;
 }
-p {
-  margin: 0;
+h3 {
+  font-size: 1.1rem;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+a {
+  color: var(--accent);
+  text-decoration: none;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Bouton de base réutilisable (on pourra créer des variantes par écran). */
+button {
+  font: inherit; /* le bouton hérite de la police du reste du site */
+  cursor: pointer;
+  color: var(--texte);
+  background: var(--surface-2);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-sm);
+  padding: var(--esp-3) var(--esp-4);
+  /* transition = anime en douceur un changement de style (ici au survol).
+     Pour chaque propriété animée, 3 valeurs : QUOI animer, en combien de TEMPS,
+     et la COURBE de vitesse. "background 0.15s ease" = le fond change en 0.15s
+     avec un départ/arrivée adoucis (ease). On en liste deux, séparées par une virgule. */
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+button:hover {
+  background: var(--bordure); /*quand on passe la souris sur le bouton, le fond devient un peu plus clair*/
+}
+
+/* #root = le conteneur où React injecte l'app. On lui donne la pleine hauteur. */
+#root {
+  min-height: 100vh;
 }

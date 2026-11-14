@@ -1,0 +1,241 @@
+/* Écran de match. var(--...) = variables de index.css. */
+
+.match {
+  max-width: 640px;
+  margin: 0 auto; /* centré horizontalement */
+  padding: var(--esp-6) var(--esp-4);
+  text-align: center;
+}
+
+/* "Club A vs Club B" */
+.match__affiche {
+  color: var(--texte-doux);
+  margin-bottom: var(--esp-5);
+}
+.match__vs {
+  color: var(--texte-doux);
+}
+
+/* --- Pronostic --- */
+.prono {
+  margin-bottom: var(--esp-6);
+}
+/* La barre : un conteneur flex, 3 segments côte à côte. overflow:hidden pour que
+   les coins arrondis coupent proprement les segments. */
+.prono__barre {
+  display: flex;
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--bordure);
+}
+/* Chaque segment prend toute la hauteur ; sa LARGEUR (le %) est posée en inline. */
+.prono__seg {
+  height: 100%;
+}
+.prono__seg--v {
+  background: var(--accent);
+} /* victoire = vert */
+.prono__seg--n {
+  background: var(--surface-2);
+} /* nul = gris neutre */
+.prono__seg--d {
+  background: var(--danger);
+} /* défaite = rouge */
+
+/* Légende sous la barre : les 3 libellés répartis sur toute la largeur. */
+.prono__legende {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--esp-2);
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+}
+
+/* --- Le choix --- */
+.choix__texte {
+  font-size: 1.2rem;
+  margin-bottom: var(--esp-4);
+}
+/* Options empilées verticalement, avec de l'espace entre elles. */
+.choix__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-3);
+}
+/* Chaque option = un grand bouton-carte, texte aligné à gauche (plus lisible). */
+.choix__option {
+  text-align: left;
+  padding: var(--esp-4);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  font-size: 0.98rem;
+}
+.choix__option:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+/* --- Après le match --- */
+/* "Fin du match" : petit label discret en majuscules au-dessus du score. */
+.match__fin {
+  color: var(--texte-doux);
+  text-transform: uppercase; /* tout en majuscules */
+  letter-spacing: 1px; /* espace les lettres → effet "étiquette" */
+  font-size: 0.8rem;
+}
+.match__score {
+  font-size: 3rem;
+  margin-bottom: var(--esp-2);
+}
+
+/* --- La pelouse --- */
+.terrain {
+  /* repeating-linear-gradient = un dégradé qui se répète → ici des bandes de
+     tonte VERTICALES (terrain horizontal). On alterne deux verts tous les 40px :
+       90deg = direction horizontale ; "#1f7a3f 0 40px" = 1re bande, puis la 2e. */
+  background: repeating-linear-gradient(
+    90deg,
+    #1f7a3f 0 40px,
+    #1c7039 40px 80px
+  );
+  border-radius: var(--rayon);
+  padding: var(--esp-4) var(--esp-3);
+  margin: var(--esp-5) 0;
+  /* Rangée : les "lignes" (= des colonnes de joueurs) se suivent de gauche à droite. */
+  display: flex;
+  flex-direction: row;
+  gap: var(--esp-2);
+  height: 340px; /* terrain horizontal : plus large que haut */
+  overflow-x: auto; /* si c'est trop étroit (mobile), on peut faire défiler */
+}
+/* Une "ligne" du terrain = une COLONNE verticale de joueurs (gardien, défense...).
+   flex: 1 0 56px → chaque colonne grandit pour partager la largeur, ne rétrécit
+   pas sous 56px (sinon les noms se chevauchent → on scrolle plutôt). */
+.terrain__ligne {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around; /* joueurs répartis sur la hauteur */
+  align-items: center;
+  flex: 1 0 56px;
+}
+/* Ligne médiane : un trait blanc VERTICAL qui sépare les deux équipes. */
+.terrain__centre {
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  margin: 0 var(--esp-2);
+  flex: 0 0 auto; /* garde sa largeur naturelle (ne s'étire pas) */
+}
+/* Un joueur : la pastille (note) + le texte dessous, empilés et centrés. */
+.joueur-terrain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-1);
+}
+/* La pastille ronde contenant la note (la couleur vient du style inline).
+   position: relative → sert de REPÈRE pour positionner les badges en absolu dessus. */
+.joueur-terrain__pastille {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex; /* pour centrer le numéro à l'intérieur */
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ffffff; /* texte blanc... */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7); /* ...+ ombre pour rester lisible sur toute couleur de club */
+  border: 3px solid; /* la couleur (secondaire du club) vient du style inline */
+}
+
+/* Les badges (⚽ buts, 👟 passes) accrochés au bord de la pastille.
+   position: absolute → placé PAR RAPPORT à la pastille (son parent relatif).
+   Un petit cartouche sombre avec l'emoji et le nombre. */
+.badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #0e1116;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  padding: 0 3px;
+  line-height: 1.4;
+}
+/* Badge buts en haut à droite, badge passes en bas à droite. Valeurs négatives
+   (-8px / -10px) = on déborde légèrement hors de la pastille. */
+.badge--but {
+  top: -8px;
+  right: -10px;
+}
+.badge--passe {
+  bottom: -8px;
+  right: -10px;
+}
+/* Numéro + nom sous la pastille. Texte blanc + ombre pour rester lisible sur le vert. */
+.joueur-terrain__nom {
+  font-size: 0.72rem;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); /* décalage x, y, flou, couleur */
+}
+/* Le récit dans une carte, aligné à gauche pour la lecture. */
+.match__recit {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--esp-4);
+  margin: var(--esp-5) 0;
+  line-height: 1.6;
+  text-align: left;
+}
+.match__sous-titre {
+  text-align: left;
+  margin-bottom: var(--esp-3);
+}
+
+/* Tableau des notes. border-collapse: collapse → les bordures des cellules
+   fusionnent en un seul trait (au lieu d'être doublées). */
+.tableau-notes {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--esp-5);
+}
+/* th = cellule d'en-tête, td = cellule de données. Mêmes marges, centrées. */
+.tableau-notes th,
+.tableau-notes td {
+  padding: var(--esp-2);
+  border-bottom: 1px solid var(--bordure);
+  text-align: center;
+}
+.tableau-notes th {
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+/* La colonne "Joueur" est alignée à gauche (le reste centré). */
+.tableau-notes__nom {
+  text-align: left;
+}
+.tableau-notes__note {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Bouton d'action principal (vert), réutilisé pour "Continuer" / "Coup d'envoi". */
+.match__continuer {
+  margin-top: var(--esp-4);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06210f;
+  font-weight: 700;
+  padding: var(--esp-4) var(--esp-6);
+  border-radius: var(--rayon);
+}
+.match__continuer:hover {
+  background: var(--accent-fonce);
+  border-color: var(--accent-fonce);
+}

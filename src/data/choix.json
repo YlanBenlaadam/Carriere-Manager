@@ -1,0 +1,110 @@
+[
+  {
+    "id": "tactique_generale",
+    "famille": "tactique",
+    "conditions": [],
+    "texte": "Quelle approche veux-tu donner à ce match ?",
+    "options": [
+      {
+        "texte": "Jouer offensif — on presse haut et on prend des risques",
+        "effetsForces": { "attaque": 1.15, "defense": 0.9 },
+        "effetsVariance": 0.2
+      },
+      {
+        "texte": "Rester équilibré — on gère le match",
+        "effetsForces": {}
+      },
+      {
+        "texte": "Verrouiller derrière — priorité à la solidité",
+        "effetsForces": { "attaque": 0.9, "defense": 1.15 }
+      }
+    ]
+  },
+  {
+    "id": "presse_avant_match",
+    "famille": "contexte",
+    "conditions": [],
+    "texte": "La presse t'attend en conférence. Quel discours ?",
+    "options": [
+      {
+        "texte": "Mettre la pression publiquement : « on doit gagner »",
+        "effetsJauges": { "fans": 8, "vestiaire": -8 },
+        "effetsVariance": 0.15
+      },
+      {
+        "texte": "Protéger tes joueurs et calmer le jeu",
+        "effetsJauges": { "vestiaire": 8, "fans": -5 }
+      }
+    ]
+  },
+  {
+    "id": "prime_president",
+    "famille": "contexte",
+    "conditions": [{ "cible": "saison", "op": ">=", "valeur": 2 }],
+    "texte": "Le président promet une grosse prime en cas de victoire.",
+    "options": [
+      {
+        "texte": "Accepter et transmettre la pression au groupe",
+        "effetsJauges": { "direction": 8, "tresorerie": -6 },
+        "effetsVariance": 0.15
+      },
+      {
+        "texte": "Refuser poliment, garder le groupe serein",
+        "effetsJauges": { "direction": -5, "vestiaire": 5 }
+      }
+    ]
+  },
+  {
+    "id": "causerie_vestiaire",
+    "famille": "gestion_humaine",
+    "conditions": [],
+    "texte": "Dernière causerie avant d'entrer sur le terrain.",
+    "options": [
+      {
+        "texte": "Haranguer le groupe, mettre le feu",
+        "effetsForces": { "attaque": 1.1 },
+        "effetsVariance": 0.2,
+        "effetsJauges": { "vestiaire": 4 }
+      },
+      {
+        "texte": "Rassurer et cadrer, rester solide",
+        "effetsForces": { "defense": 1.1 },
+        "effetsJauges": { "vestiaire": 4 }
+      }
+    ]
+  },
+  {
+    "id": "match_piege",
+    "famille": "tactique",
+    "conditions": [],
+    "texte": "Sur le papier c'est un match piège. Quelle attitude ?",
+    "options": [
+      {
+        "texte": "Prendre le jeu à son compte",
+        "effetsForces": { "attaque": 1.12, "defense": 0.95 },
+        "effetsVariance": 0.15
+      },
+      {
+        "texte": "Rester patient et compact",
+        "effetsForces": { "attaque": 0.95, "defense": 1.1 }
+      }
+    ]
+  },
+  {
+    "id": "tifo_supporters",
+    "famille": "contexte",
+    "conditions": [],
+    "texte": "Les ultras ont préparé un tifo géant pour ce match.",
+    "options": [
+      {
+        "texte": "Saluer le virage, jouer pour eux",
+        "effetsJauges": { "fans": 8, "vestiaire": -3 },
+        "effetsVariance": 0.15
+      },
+      {
+        "texte": "Garder les joueurs concentrés sur le match",
+        "effetsJauges": { "vestiaire": 6, "fans": -3 }
+      }
+    ]
+  }
+]

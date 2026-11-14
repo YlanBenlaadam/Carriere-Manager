@@ -78,8 +78,8 @@ export function jouerMatchAvecOption(
   const issue = tirerIssue(pronostic, rng)
   const score = tirerScore(issue, rng)
 
-  // 6) On génère les notes des joueurs à partir du score obtenu.
-  const notes = genererNotes(nos, score, rng)
+  // 6) On génère les stats des joueurs (notes + buteurs + passeurs) depuis le score.
+  const stats = genererNotes(nos, score, rng)
 
   // 7) On assemble le résultat. Le `pronostic` renvoyé est bien celui qui a servi
   //    au tirage (donc forces + variance incluses), pas le pronostic de base.
@@ -87,7 +87,9 @@ export function jouerMatchAvecOption(
     butsPour: score.butsPour,
     butsContre: score.butsContre,
     pronostic,
-    notes,
+    notes: stats.notes,
+    buteurs: stats.buteurs,
+    passeurs: stats.passeurs,
   }
 }
 

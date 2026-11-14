@@ -1,0 +1,156 @@
+/* Hub de saison. Rappel : var(--...) = variables définies dans index.css. */
+
+.hub {
+  max-width: 760px;
+  margin: 0 auto; /* centré horizontalement */
+  padding: var(--esp-6) var(--esp-4);
+}
+
+/* En-tête : pastille + bloc texte, côte à côte.
+   flex (par défaut en ligne) + align-items:center → alignés verticalement au centre. */
+.hub__entete {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-4);
+  padding-bottom: var(--esp-4);
+  margin-bottom: var(--esp-5);
+  border-bottom: 1px solid var(--bordure);
+}
+
+/* Pastille plus grande que sur les cartes (48px). Cercle = carré + border-radius 50%. */
+.hub__pastille {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid;
+  flex-shrink: 0; /* empêche le cercle de s'écraser si le nom est long */
+}
+
+.hub__meta {
+  color: var(--texte-doux);
+  margin-top: var(--esp-1);
+}
+.hub__etoiles {
+  color: var(--or);
+}
+
+/* Bouton principal du hub : pleine largeur, couleur d'accent (l'action clé). */
+.hub__jouer {
+  width: 100%; /* prend toute la largeur du conteneur */
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06210f; /* texte sombre sur fond vif = contraste */
+  font-weight: 700;
+  padding: var(--esp-4);
+  border-radius: var(--rayon);
+  margin-bottom: var(--esp-6);
+}
+.hub__jouer:hover {
+  background: var(--accent-fonce);
+  border-color: var(--accent-fonce);
+}
+
+/* Message affiché quand tous les matchs clés de la saison sont joués. */
+.hub__saison-finie {
+  text-align: center;
+  color: var(--texte-doux);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--esp-4);
+  margin-bottom: var(--esp-6);
+}
+
+/* Les jauges en grille responsive : des colonnes d'au moins 200px.
+   auto-fit = on remplit la largeur ; sur mobile ça retombe à 1 colonne. */
+.hub__jauges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--esp-4);
+  margin-bottom: var(--esp-6);
+}
+
+.jauge {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-sm);
+  padding: var(--esp-3);
+}
+
+/* En-tête de jauge : label à gauche, valeur à droite.
+   justify-content: space-between → pousse les deux enfants aux extrémités. */
+.jauge__entete {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--esp-2);
+  font-size: 0.9rem;
+}
+.jauge__label {
+  color: var(--texte-doux);
+}
+.jauge__valeur {
+  font-weight: 700;
+}
+
+/* La piste (rail de fond). overflow:hidden → le remplissage arrondi ne dépasse pas
+   des coins. height fixe = l'épaisseur de la barre. */
+.jauge__piste {
+  height: 10px;
+  background: var(--surface-2);
+  border-radius: 999px; /* très grand rayon → extrémités parfaitement arrondies */
+  overflow: hidden;
+}
+/* Le remplissage : hauteur pleine, largeur posée en inline (la valeur %).
+   transition → la barre s'anime en douceur quand la valeur change. */
+.jauge__remplissage {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease; /* QUOI: width, DURÉE: 0.3s, COURBE: ease (adoucie) */
+}
+
+/* --- Effectif --- */
+.hub__effectif h2 {
+  margin-bottom: var(--esp-3);
+}
+
+/* Reset de la liste : pas de puces, pas de retrait par défaut du navigateur. */
+.liste-joueurs {
+  list-style: none;
+  padding: 0;
+}
+
+/* Une ligne joueur : plusieurs colonnes alignées. */
+.joueur {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-2) 0;
+  border-bottom: 1px solid var(--bordure);
+}
+
+/* Badge de poste : petite étiquette carrée de largeur fixe (pour aligner les noms). */
+.joueur__poste {
+  width: 28px;
+  text-align: center;
+  background: var(--surface-2);
+  border-radius: var(--rayon-sm);
+  padding: var(--esp-1) 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--texte-doux);
+}
+
+/* flex:1 → ce nom prend TOUT l'espace restant, ce qui pousse âge/niveau à droite. */
+.joueur__nom {
+  flex: 1;
+}
+.joueur__age {
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+}
+.joueur__niveau {
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 26px;
+  text-align: right;
+}

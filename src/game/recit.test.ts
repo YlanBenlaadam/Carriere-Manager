@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { raconterMatch } from './recit'
-import type { MatchResult, Player, Pronostic } from './types'
+import type { MatchResult, Player, Pronostic, Option } from './types'
 
 const pronosticBidon: Pronostic = { victoire: 0.33, nul: 0.34, defaite: 0.33 }
 
@@ -31,6 +31,8 @@ function resultat(butsPour: number, butsContre: number): MatchResult {
     butsContre,
     pronostic: pronosticBidon,
     notes: { p1: 8.5, p2: 6 },
+    buteurs: {},
+    passeurs: {},
   }
 }
 
@@ -57,5 +59,28 @@ describe('raconterMatch', () => {
     const texte = raconterMatch(resultat(2, 1), joueurs)
     expect(texte).toContain('Dupont')
     expect(texte).toContain('8.5')
+  })
+
+  // Un choix offensif (booste l'attaque) et un choix prudent (booste la défense).
+  const choixOffensif: Option = { texte: '', effetsForces: { attaque: 1.2 } }
+  const choixPrudent: Option = { texte: '', effetsForces: { defense: 1.2 } }
+  const choixJauges: Option = { texte: '', effetsJauges: { fans: 5 } }
+
+  it('choix offensif + victoire → le récit dit que le pari a payé', () => {
+    expect(raconterMatch(resultat(2, 0), joueurs, choixOffensif)).toContain('payé')
+  })
+
+  it('choix offensif + défaite → le récit dit que le pari s’est retourné', () => {
+    expect(raconterMatch(resultat(0, 2), joueurs, choixOffensif)).toContain('retourné')
+  })
+
+  it('choix prudent + défaite → le récit dit que ça n’a pas suffi', () => {
+    expect(raconterMatch(resultat(0, 2), joueurs, choixPrudent)).toContain('pas suffi')
+  })
+
+  it('choix sans impact tactique (jauges) → pas de commentaire de choix', () => {
+    const texte = raconterMatch(resultat(1, 0), joueurs, choixJauges)
+    expect(texte).not.toContain('pari')
+    expect(texte).not.toContain('prudente')
   })
 })
