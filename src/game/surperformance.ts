@@ -22,23 +22,43 @@ export function rangDe(classementIds: string[], clubId: string): number {
   return index + 1 // index 0 = 1re place
 }
 
-// Transforme l'écart (rang attendu − rang réel) en une note /10, par PALIERS :
-//   - finir au rang attendu OU mieux (ecart >= 0) → excellente saison : 7 à 10
-//   - 1 à 3 places sous l'attendu                 → saison moyenne     : 5 à 6
-//   - plus de 3 places sous l'attendu             → saison ratée       : 2 à 4.5
-// Dans chaque palier, on tire une valeur au hasard (via rng) pour varier la note.
-export function noteSurperformance(rangReel: number, rangAttendu: number, rng: Rng): number {
-  const ecart = rangAttendu - rangReel // > 0 = mieux que prévu, < 0 = moins bien
-
-  let note: number
-  if (ecart >= 0) {
-    note = 7 + rng() * 3 // 7 à 10
-  } else if (ecart >= -3) {
-    note = 5 + rng() * 1 // 5 à 6
-  } else {
-    note = 2 + rng() * 2.5 // 2 à 4.5
+// Note de fin de saison /10, qui mélange DEUX choses :
+//   - la PLACE absolue au classement (finir haut = mieux) ;
+//   - la SURPERFORMANCE (a-t-on fait mieux que le rang attendu ?).
+// Ainsi, finir 9e en "faisant le job" reste moyen, mais grimper bien au-dessus de
+// l'attendu donne une excellente note. Réglages (poids, paliers) à affiner au playtest.
+export function noteSurperformance(
+  rangReel: number,
+  rangAttendu: number,
+  nbClubs: number,
+  rng: Rng,
+): number {
+  // 1) Note ABSOLUE : 1er → 10, dernier → ~3 (réparti linéairement).
+  let noteAbsolue = 10
+  if (nbClubs > 1) {
+    noteAbsolue = 10 - ((rangReel - 1) / (nbClubs - 1)) * 7
   }
 
-  // Arrondi à une décimale.
+  // 2) Note RELATIVE : écart entre le rang attendu et le rang réel.
+  const ecart = rangAttendu - rangReel
+  let noteRelative: number
+  if (ecart >= 0) {
+    noteRelative = 7 + Math.min(ecart, 3) // au niveau attendu (7) → gros dépassement (10)
+  } else if (ecart >= -3) {
+    noteRelative = 5 // 1 à 3 places sous l'attendu
+  } else {
+    noteRelative = 3 // bien en dessous de l'attendu
+  }
+
+  // 3) Mélange : 40 % place absolue + 60 % surperformance, + un léger hasard.
+  let note = noteAbsolue * 0.4 + noteRelative * 0.6 + (rng() - 0.5) * 0.6
+
+  // Bornes [1, 10] et arrondi à une décimale.
+  if (note < 1) {
+    note = 1
+  }
+  if (note > 10) {
+    note = 10
+  }
   return Math.round(note * 10) / 10
 }

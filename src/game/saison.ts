@@ -155,8 +155,8 @@ export function faireBilan(
   // Rang attendu : position du club si on classe tout le monde par force.
   const rangAttendu = rangDe(classementAttendu(forcesParClub), clubId)
 
-  // Note à partir de l'écart entre les deux rangs (par paliers + un peu de hasard).
-  const note = noteSurperformance(rangReel, rangAttendu, rng)
+  // Note : mélange place absolue + surperformance (nbClubs = taille du championnat).
+  const note = noteSurperformance(rangReel, rangAttendu, classementReel.length, rng)
 
   // Licencié dès qu'UNE jauge atteint 0 (règle v1 : licenciement = fin de carrière).
   const licencie =

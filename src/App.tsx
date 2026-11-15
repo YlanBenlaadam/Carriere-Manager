@@ -3,9 +3,12 @@ import { ChoixClub } from './ui/ChoixClub'
 import { HubSaison } from './ui/HubSaison'
 import { EcranMatch } from './ui/EcranMatch'
 import { EcranBilan } from './ui/EcranBilan'
-import { creerPartie, terminerSaison } from './game/carriere'
+import { EcranOffres } from './ui/EcranOffres'
+import { creerPartie, terminerSaison, genererOffres, accepterOffre } from './game/carriere'
+import { creerRng } from './game/rng'
+import { CLUBS } from './data/clubs'
 import { EFFECTIFS } from './data/effectifs'
-import type { GameState, Jauges, ResultatRencontre, Bilan, Trophee } from './game/types'
+import type { GameState, Jauges, ResultatRencontre, Bilan, Trophee, Club } from './game/types'
 import './App.css'
 
 // Nombre de matchs clés joués à la main dans une saison (le reste sera simulé).
@@ -29,6 +32,10 @@ function App() {
   const [resultatsSaison, setResultatsSaison] = useState<ResultatRencontre[]>([])
   // carriereFinie : vrai quand la carrière est terminée (licencié ou 5 saisons).
   const [carriereFinie, setCarriereFinie] = useState(false)
+  // offres : les clubs qui nous font une offre à l'intersaison (vide = aucune).
+  // enOffres : affiche-t-on l'écran d'intersaison (offres) ?
+  const [offres, setOffres] = useState<Club[]>([])
+  const [enOffres, setEnOffres] = useState(false)
 
   // Appelée quand on clique un club : on crée la partie et on remet les compteurs
   // de saison à zéro (journée 1, aucun résultat encore).
@@ -69,10 +76,25 @@ function App() {
     if (resultat.finie) {
       setCarriereFinie(true)
     } else {
-      // Nouvelle saison : on remet la journée à 1 et on vide les résultats.
-      setJournee(1)
-      setResultatsSaison([])
+      // Pas finie → intersaison : on génère les offres (selon la nouvelle réputation)
+      // et on affiche l'écran d'offres.
+      const rng = creerRng(resultat.etat.seed + resultat.etat.saison)
+      setOffres(genererOffres(resultat.etat.reputation, resultat.etat.clubId, CLUBS, rng))
+      setEnOffres(true)
     }
+  }
+
+  // Choix fait à l'intersaison : 'rester' au club, ou l'id d'un club dont on accepte
+  // l'offre. Puis on démarre la saison suivante (journée 1, résultats vidés).
+  function choisirOffre(choix: string) {
+    if (partie !== undefined && choix !== 'rester') {
+      // On change de club : nouvel effectif, jauges remises à neuf (voir accepterOffre).
+      setPartie(accepterOffre(partie, choix, EFFECTIFS[choix]))
+    }
+    // on repart pour une nouvelle saison (journée 1, résultats vidés) et on quitte l'écran d'offres.
+    setEnOffres(false)
+    setJournee(1)
+    setResultatsSaison([])
   }
 
   // Repartir d'une nouvelle carrière : on remet tous les états à leur valeur initiale.
@@ -80,6 +102,7 @@ function App() {
     setPartie(undefined)
     setCarriereFinie(false)
     setEnMatch(false)
+    setEnOffres(false)
     setEcranChoix(false)
     setJournee(1)
     setResultatsSaison([])
@@ -101,6 +124,10 @@ function App() {
           </button>
         </main>
       )
+    }
+    // 1a bis) Intersaison → écran des offres (rester ou changer de club).
+    if (enOffres) {
+      return <EcranOffres etat={partie} offres={offres} onChoisir={choisirOffre} />
     }
     // 1b) On joue un match → l'écran de match.
     if (enMatch) {

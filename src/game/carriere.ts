@@ -8,9 +8,8 @@ const REPUTATION_DEPART = 30
 // Réglages de carrière (à affiner au playtest) :
 const SAISONS_MAX = 5 // la carrière se termine au bout de 5 saisons...
 const REPUTATION_PAR_POINT = 3 // ...la réputation bouge de 3 par point de note au-dessus/sous la moyenne (5.5)
-const OFFRE_MARGE_HAUT = 10 // on peut recevoir des offres de clubs jusqu'à 10 de prestige AU-DESSUS de sa réputation
-const OFFRE_MARGE_BAS = 15 // ...et jusqu'à 15 EN DESSOUS
-const MAX_OFFRES = 3 // nombre maximum d'offres proposées
+const MAX_OFFRES = 3 // nombre d'offres proposées à l'intersaison
+const TAILLE_VIVIER = 6 // on pioche les offres parmi les N clubs les plus proches en niveau
 
 /** Ce que renvoie la fin de saison : le nouvel état + si la carrière est finie. */
 export interface ResultatFinSaison {
@@ -102,35 +101,65 @@ export function terminerSaison(
   return { etat, finie, raison }
 }
 
-// Génère les offres d'embauche de fin de saison : les clubs dont le prestige est
-// proche de la réputation du coach (un peu au-dessus, un peu en dessous). Plus la
-// réputation est haute, plus les clubs proposés sont prestigieux.
+// Génère les offres d'embauche de fin de saison. On propose surtout des clubs de
+// NIVEAU COMPARABLE au club actuel (étoiles similaires), avec une cible légèrement
+// tirée vers le haut/bas selon la réputation (bonne saison = clubs un peu plus gros).
+// On garantit toujours au moins une offre d'un cran AU-DESSUS (progression).
 export function genererOffres(
   reputation: number,
   clubActuelId: string,
   tousLesClubs: Club[],
   rng: Rng,
 ): Club[] {
-  // On garde les clubs dans la "fourchette" de réputation, en excluant le club actuel.
-  const eligibles = tousLesClubs.filter((club) => {
-    const dansLaFourchette =
-      club.prestige <= reputation + OFFRE_MARGE_HAUT &&
-      club.prestige >= reputation - OFFRE_MARGE_BAS
-    return club.id !== clubActuelId && dansLaFourchette
-  })
+  const clubActuel = tousLesClubs.find((c) => c.id === clubActuelId)
+  // Niveau visé : le prestige du club actuel, nudgé par la réputation (au-dessus de
+  // 50 ça tire vers le haut, en dessous vers le bas, légèrement).
+  const base = clubActuel !== undefined ? clubActuel.prestige : 50
+  const niveauCible = base + (reputation - 50) * 0.2
 
-  // On mélange la liste (algorithme de Fisher-Yates) pour tirer des offres au hasard,
-  // puis on garde les premières. Le mélange : on part de la fin et on échange chaque
-  // case avec une case tirée au hasard parmi celles d'avant (elle incluse).
-  const melange = [...eligibles]
-  for (let i = melange.length - 1; i > 0; i--) {
+  // On trie les autres clubs du PLUS PROCHE au plus éloigné de ce niveau visé
+  // (Math.abs = distance, sans le signe) → les "étoiles similaires" d'abord.
+  const autres = tousLesClubs.filter((c) => c.id !== clubActuelId)
+  const parProximite = [...autres].sort(
+    (a, b) => Math.abs(a.prestige - niveauCible) - Math.abs(b.prestige - niveauCible),
+  )
+
+  // On garde un vivier des plus proches, on le mélange (Fisher-Yates), puis on prend
+  // MAX_OFFRES. Ainsi on a toujours plusieurs offres de niveau comparable.
+  const vivier = parProximite.slice(0, TAILLE_VIVIER)
+  for (let i = vivier.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1))
-    const temp = melange[i]
-    melange[i] = melange[j]
-    melange[j] = temp
+    const temp = vivier[i]
+    vivier[i] = vivier[j]
+    vivier[j] = temp
   }
 
-  return melange.slice(0, MAX_OFFRES)
+  const offres = vivier.slice(0, MAX_OFFRES)
+
+  // PROGRESSION : on garantit toujours au moins une offre d'un club PLUS prestigieux
+  // que le club actuel (le cran juste au-dessus, le plus accessible), pour qu'on
+  // puisse grimper même en partant d'un petit club. (clubActuel est défini plus haut.)
+  if (clubActuel !== undefined) {
+    const dejaUnePlusGrosse = offres.some((o) => o.prestige > clubActuel.prestige)
+    if (!dejaUnePlusGrosse) {
+      // Les clubs plus prestigieux, triés du moins au plus prestigieux : on prend
+      // le premier = le cran juste au-dessus.
+      const plusGros = tousLesClubs
+        .filter((c) => c.id !== clubActuelId && c.prestige > clubActuel.prestige)
+        .sort((a, b) => a.prestige - b.prestige)
+      if (plusGros.length > 0) {
+        const cranAuDessus = plusGros[0]
+        if (offres.length < MAX_OFFRES) {
+          offres.push(cranAuDessus)
+        } else {
+          // Plus de place : on remplace la dernière offre (la moins intéressante).
+          offres[offres.length - 1] = cranAuDessus
+        }
+      }
+    }
+  }
+
+  return offres
 }
 
 // Le coach accepte une offre : il change de club. On repart avec le nouvel effectif

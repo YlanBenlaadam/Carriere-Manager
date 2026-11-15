@@ -114,20 +114,16 @@ describe('terminerSaison', () => {
 })
 
 describe('genererOffres', () => {
-  it('réputation basse → offres de petits clubs seulement', () => {
-    // rep 30 → fourchette [15, 40] → seul "modeste" (36) qualifie.
-    const offres = genererOffres(30, 'moyen', clubsTest, creerRng(1))
-    for (const o of offres) {
-      expect(o.prestige).toBeLessThanOrEqual(40)
-    }
+  it('garantit toujours au moins une offre d’un club plus prestigieux (progression)', () => {
+    // Petit club 'modeste' (36) : on doit pouvoir grimper → au moins une offre > 36.
+    const offres = genererOffres(40, 'modeste', clubsTest, creerRng(1))
+    expect(offres.some((o) => o.prestige > 36)).toBe(true)
   })
 
-  it('réputation haute → offres de gros clubs', () => {
-    // rep 90 → fourchette [75, 100] → "gros" (78) et "geant" (100).
+  it('réputation haute → de gros clubs dans les offres', () => {
+    // rep 90, club 'moyen' → fourchette [75, 100] → "gros" (78) et "geant" (100).
     const offres = genererOffres(90, 'moyen', clubsTest, creerRng(1))
-    for (const o of offres) {
-      expect(o.prestige).toBeGreaterThanOrEqual(75)
-    }
+    expect(offres.some((o) => o.prestige >= 75)).toBe(true)
   })
 
   it('ne propose jamais le club actuel', () => {
@@ -135,8 +131,13 @@ describe('genererOffres', () => {
     expect(offres.find((o) => o.id === 'moyen')).toBeUndefined()
   })
 
+  it('déjà au sommet (prestige 100) → aucune offre plus grosse n’est forcée', () => {
+    const offres = genererOffres(100, 'geant', clubsTest, creerRng(1))
+    expect(offres.some((o) => o.prestige > 100)).toBe(false)
+  })
+
   it('ne propose pas plus de 3 offres', () => {
-    const offres = genererOffres(60, 'xxx', clubsTest, creerRng(1))
+    const offres = genererOffres(50, 'modeste', clubsTest, creerRng(1))
     expect(offres.length).toBeLessThanOrEqual(3)
   })
 })

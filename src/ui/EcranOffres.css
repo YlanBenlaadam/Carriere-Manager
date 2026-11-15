@@ -1,0 +1,73 @@
+/* Écran d'intersaison (offres). var(--...) = variables de index.css. */
+
+.offres {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--esp-6) var(--esp-4);
+  text-align: center;
+}
+
+.offres__titre {
+  margin-bottom: var(--esp-2);
+}
+.offres__sous {
+  color: var(--texte-doux);
+  margin-bottom: var(--esp-5);
+}
+
+/* Bouton "rester" : pleine largeur, discret (bordure) car c'est l'option neutre. */
+.offres__rester {
+  width: 100%;
+  padding: var(--esp-4);
+  border-radius: var(--rayon);
+  margin-bottom: var(--esp-6);
+  font-weight: 700;
+}
+
+.offres__h2 {
+  text-align: left;
+  margin-bottom: var(--esp-4);
+  padding-bottom: var(--esp-2);
+  border-bottom: 1px solid var(--bordure);
+}
+
+/* Grille d'offres, même logique responsive que l'écran de choix du club. */
+.offres__liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--esp-3);
+}
+
+/* Une carte-club d'offre (cliquable). */
+.carte-offre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--esp-4);
+}
+.carte-offre:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+.carte-offre__pastille {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid; /* couleur (secondaire) via style inline */
+}
+.carte-offre__nom {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.carte-offre__etoiles {
+  color: var(--or);
+  letter-spacing: 2px;
+}
+
+.offres__vide {
+  color: var(--texte-doux);
+}

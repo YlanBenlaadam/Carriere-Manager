@@ -27,29 +27,28 @@ describe('rangDe', () => {
 })
 
 describe('noteSurperformance', () => {
-  it('fini au rang attendu → palier excellent (7 à 10)', () => {
-    // rangReel = rangAttendu → ecart 0 → palier "7 à 10". rngFixe(0) donne le bas = 7.
-    expect(noteSurperformance(5, 5, rngFixe(0))).toBe(7)
-    expect(noteSurperformance(5, 5, rngFixe(0.5))).toBe(8.5)
+  // Championnat à 10 clubs. rngFixe(0.5) → le petit hasard vaut 0 (centré).
+  it('finir bas MAIS au rang attendu → note moyenne (pas excellente)', () => {
+    // 9e sur 10, attendu 9e → place basse + pas de dépassement → ~5.7 (jaune).
+    const note = noteSurperformance(9, 9, 10, rngFixe(0.5))
+    expect(note).toBeGreaterThan(4)
+    expect(note).toBeLessThan(7) // surtout : ce n'est PAS 9+
   })
 
-  it('fini mieux que prévu → palier excellent aussi', () => {
-    // attendu 8e, fini 3e → ecart +5 >= 0 → 7 à 10.
-    const note = noteSurperformance(3, 8, rngFixe(0.5))
-    expect(note).toBeGreaterThanOrEqual(7)
-    expect(note).toBeLessThanOrEqual(10)
+  it('grimper très au-dessus de l’attendu → excellente note', () => {
+    // 2e sur 10 alors qu'attendu 9e → bonne place + gros dépassement → vert élevé.
+    const note = noteSurperformance(2, 9, 10, rngFixe(0.5))
+    expect(note).toBeGreaterThanOrEqual(9)
   })
 
-  it('1 à 3 places sous l’attendu → palier moyen (5 à 6)', () => {
-    // attendu 5e, fini 7e → ecart -2 → 5 à 6. rngFixe(0) donne 5.
-    expect(noteSurperformance(7, 5, rngFixe(0))).toBe(5)
-    expect(noteSurperformance(7, 5, rngFixe(0.5))).toBe(5.5)
-  })
-
-  it('plus de 3 places sous l’attendu → palier raté (2 à 4.5)', () => {
-    // attendu 5e, fini 10e → ecart -5 → 2 à 4.5. rngFixe(0) donne 2.
-    expect(noteSurperformance(10, 5, rngFixe(0))).toBe(2)
-    const note = noteSurperformance(10, 5, rngFixe(0.99))
+  it('finir dernier bien en dessous de l’attendu → mauvaise note', () => {
+    // 10e sur 10, attendu 5e → place basse + sous-performance → rouge (< 5).
+    const note = noteSurperformance(10, 5, 10, rngFixe(0.5))
     expect(note).toBeLessThan(5)
+  })
+
+  it('reste bornée dans [1, 10]', () => {
+    expect(noteSurperformance(1, 10, 10, rngFixe(0.99))).toBeLessThanOrEqual(10)
+    expect(noteSurperformance(10, 1, 10, rngFixe(0))).toBeGreaterThanOrEqual(1)
   })
 })
