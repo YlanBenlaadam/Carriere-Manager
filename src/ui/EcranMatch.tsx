@@ -22,6 +22,7 @@ import type {
   Choice,
   Pronostic,
   ResultatRencontre,
+  Finale,
 } from '../game/types'
 import './EcranMatch.css'
 
@@ -40,22 +41,31 @@ interface Resolution {
   recit: string
   nouvellesJauges: Jauges
   rencontre: ResultatRencontre // notre résultat, pour le classement de fin de saison
+  gagne: boolean // a-t-on gagné ? (en finale, inclut la séance de tirs au but)
+  tirsAuBut: boolean // la finale s'est-elle décidée aux tirs au but (match nul) ?
 }
 
 // Prépare le match de la JOURNÉE donnée : adversaire, compositions, pronostic, choix.
 // La graine dépend de la saison ET de la journée → chaque journée a son propre match
 // (adversaire et tirage différents), et ça reste stable au re-render de cette journée.
-function preparerMatch(partie: GameState, journee: number): SetupMatch {
+// adversaireImpose : si fourni (cas d'une FINALE de coupe), c'est l'adversaire ; sinon
+// on prend l'adversaire de championnat correspondant à la journée.
+function preparerMatch(partie: GameState, journee: number, adversaireImpose?: string): SetupMatch {
   const rng = creerRng(partie.seed + partie.saison * 100 + journee)
 
-  // Adversaire : un club du même championnat (jamais nous-mêmes). On en prend un
-  // DIFFÉRENT à chaque journée : le (journee-1)-ième de la liste (journée 1 → 1er, etc.).
   const monClub = CLUBS.find((c) => c.id === partie.clubId)!
-  const adversairesPossibles = CLUBS.filter(
-    (c) => c.championnat === monClub.championnat && c.id !== partie.clubId,
-  )
-  const indexAdversaire = (journee - 1) % adversairesPossibles.length
-  const adversaire = adversairesPossibles[indexAdversaire]
+
+  // Choix de l'adversaire : imposé (finale) ou tiré de la liste du championnat.
+  let adversaire: Club
+  if (adversaireImpose !== undefined) {
+    adversaire = CLUBS.find((c) => c.id === adversaireImpose)!
+  } else {
+    const adversairesPossibles = CLUBS.filter(
+      (c) => c.championnat === monClub.championnat && c.id !== partie.clubId,
+    )
+    const indexAdversaire = (journee - 1) % adversairesPossibles.length
+    adversaire = adversairesPossibles[indexAdversaire]
+  }
 
   // Compositions (meilleur XI de chaque équipe) et pronostic de base.
   // idee : plus tard faire en sorte de choisir la compos d'avant match en fonction des notes des joueurs... et sa affluera sur la note de l'equipe et donc le resultat
@@ -132,16 +142,25 @@ function JoueurSurTerrain({
 export function EcranMatch({
   partie,
   journee,
+  finale,
   onContinuer,
 }: {
   partie: GameState
   journee: number // numéro du match clé dans la saison (1, 2, 3...)
-  onContinuer: (nouvellesJauges: Jauges, rencontre: ResultatRencontre) => void
+  finale?: Finale // si fourni, c'est une FINALE de coupe (adversaire imposé + thème)
+  onContinuer: (nouvellesJauges: Jauges, rencontre: ResultatRencontre, gagne: boolean) => void
 }) {
+  // Adversaire imposé si c'est une finale (sinon undefined → adversaire de championnat).
+  const adversaireImpose = finale !== undefined ? finale.adversaireId : undefined
+
+  // Thème visuel : 'championnat' par défaut, sinon la compétition de la finale.
+  const theme = finale !== undefined ? finale.competition : 'championnat'
+  const classeRacine = 'match match--' + theme
+
   // Préparation calculée UNE fois (l'initialiseur de useState ne tourne qu'au montage).
   // On ne veut pas recalculer à chaque re-render (ex. si on clique sur une option).
   //setup contient l'adversaire, les titulaires, le pronostic et le choix proposé (tt les infos necessaire) voir fct preparerMatch
-  const [setup] = useState(() => preparerMatch(partie, journee))
+  const [setup] = useState(() => preparerMatch(partie, journee, adversaireImpose))
   // Résultat : undefined tant que le match n'est pas joué, rempli après le choix.
   // cette variable(resolution) va contenir le résultat du match, le récit et les nouvelles jauges après le match
   const [resolution, setResolution] = useState<Resolution | undefined>(undefined)
@@ -179,7 +198,18 @@ export function EcranMatch({
       butsExterieur: resultat.butsContre,
     }
 
-    setResolution({ resultat, recit, nouvellesJauges, rencontre })
+    // A-t-on gagné ? En CHAMPIONNAT, un nul reste un nul (pas de vainqueur).
+    // En FINALE de coupe, il faut un vainqueur : si c'est nul, on le décide aux
+    // tirs au but (tirage au sort seedé, 50/50).
+    let gagne = resultat.butsPour > resultat.butsContre
+    let tirsAuBut = false
+    const nul = resultat.butsPour === resultat.butsContre
+    if (finale !== undefined && nul) {
+      tirsAuBut = true
+      gagne = rng() < 0.5 // séance de tirs au but
+    }
+
+    setResolution({ resultat, recit, nouvellesJauges, rencontre, gagne, tirsAuBut })
   }
 
   // ---- Affichage APRÈS le match (si on a une résolution) ----
@@ -224,7 +254,9 @@ export function EcranMatch({
     }
 
     return (
-      <div className="match">
+      <div className={classeRacine}>
+        {/* Bannière de compétition (seulement pour une finale de coupe). */}
+        {finale !== undefined && <p className="match__competition">{finale.titre}</p>}
         <p className="match__fin">Fin du match</p>
         <h1 className="match__score">
           {resultat.butsPour} – {resultat.butsContre}
@@ -232,6 +264,13 @@ export function EcranMatch({
         <p className="match__affiche">
           {monClub.nom} vs {setup.adversaire.nom}
         </p>
+
+        {/* Si la finale s'est jouée aux tirs au but, on l'indique (et qui a gagné). */}
+        {resolution.tirsAuBut && (
+          <p className="match__tab">
+            Tirs au but — {resolution.gagne ? 'Victoire !' : 'Défaite'}
+          </p>
+        )}
 
         {/* La pelouse HORIZONTALE : NOTRE équipe à gauche (gardien à l'extrême
             gauche → attaque vers le centre), une ligne médiane verticale, puis
@@ -279,7 +318,9 @@ export function EcranMatch({
         <button
           type="button"
           className="match__continuer"
-          onClick={() => onContinuer(resolution.nouvellesJauges, resolution.rencontre)}
+          onClick={() =>
+            onContinuer(resolution.nouvellesJauges, resolution.rencontre, resolution.gagne)
+          }
         >
           Continuer
         </button>
@@ -289,7 +330,9 @@ export function EcranMatch({
 
   // ---- Affichage AVANT le match : pronostic + choix ----
   return (
-    <div className="match">
+    <div className={classeRacine}>
+      {/* Bannière de compétition (seulement pour une finale de coupe). */}
+      {finale !== undefined && <p className="match__competition">{finale.titre}</p>}
       <p className="match__affiche">
         {monClub.nom} <span className="match__vs">vs</span> {setup.adversaire.nom}
       </p>

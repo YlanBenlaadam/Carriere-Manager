@@ -7,6 +7,34 @@
   text-align: center;
 }
 
+/* Bannière de compétition (finale de coupe) : un bandeau en majuscules, coloré
+   différemment selon la compétition pour qu'on sente tout de suite "match spécial". */
+.match__competition {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 1.1rem; /* titre de finale bien visible */
+  margin-bottom: var(--esp-2);
+  color: var(--accent);
+}
+
+/* Ligne "Tirs au but — Victoire/Défaite" (finale décidée aux t.a.b.). */
+.match__tab {
+  font-weight: 700;
+  color: var(--or);
+  margin-bottom: var(--esp-3);
+}
+/* Couleur de la bannière selon la compétition (thème à enrichir ensuite). */
+.match--ldc .match__competition {
+  color: #5aa9ff; /* bleu "C1" */
+}
+.match--europa .match__competition {
+  color: #ff8c1a; /* orange Europa */
+}
+.match--coupe_nationale .match__competition {
+  color: #e23838; /* rouge coupe */
+}
+
 /* "Club A vs Club B" */
 .match__affiche {
   color: var(--texte-doux);
@@ -110,6 +138,16 @@
   height: 340px; /* terrain horizontal : plus large que haut */
   overflow-x: auto; /* si c'est trop étroit (mobile), on peut faire défiler */
 }
+/* Thème LDC : pelouse teintée BLEU NUIT (match "spécial"). On remplace juste le
+   dégradé de fond ; le placement et les pastilles ne changent pas. */
+.match--ldc .terrain {
+  background: repeating-linear-gradient(90deg, #13204a 0 40px, #172a57 40px 80px);
+}
+/* Thème Europa : pelouse plus sombre/chaude (ambiance de soirée européenne). */
+.match--europa .terrain {
+  background: repeating-linear-gradient(90deg, #3a4d24 0 40px, #344622 40px 80px);
+}
+
 /* Une "ligne" du terrain = une COLONNE verticale de joueurs (gardien, défense...).
    flex: 1 0 56px → chaque colonne grandit pour partager la largeur, ne rétrécit
    pas sous 56px (sinon les noms se chevauchent → on scrolle plutôt). */

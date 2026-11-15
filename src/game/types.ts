@@ -221,6 +221,13 @@ export type CompetitionEurope = 'ldc' | 'europa'
 /** Une compétition à élimination directe dont on joue la finale. */
 export type Competition = 'coupe_nationale' | 'ldc' | 'europa'
 
+/** Une finale à jouer : la compétition, l'adversaire (id) et un titre d'affichage. */
+export interface Finale {
+  competition: Competition
+  adversaireId: string
+  titre: string
+}
+
 /** Les types de trophées que le joueur peut remporter au cours de sa carrière.
  *  'championnat' = titre de champion (finir 1er du championnat). */
 export type TypeTrophee = 'championnat' | 'coupe_nationale' | 'ldc' | 'europa'

@@ -37,22 +37,17 @@ function Jauge({ label, valeur }: { label: string; valeur: number }) {
 }
 
 // --- Le hub de saison : écran principal une fois le club choisi. ---
-// Props : la partie en cours, la journée (match clé n°X), le nombre total de matchs
-// clés de la saison, et onJouer (clic sur "Jouer le match").
+// Props : la partie en cours, le libellé du bouton (ex. "Jouer le match clé 3/5"
+// ou "Finale — Ligue des Champions"), et onJouer (clic sur ce bouton).
 export function HubSaison({
   partie,
-  journee,
-  nbMatchs,
+  labelBouton,
   onJouer,
 }: {
   partie: GameState
-  journee: number
-  nbMatchs: number
+  labelBouton: string
   onJouer: () => void
 }) {
-  // La saison est-elle terminée ? (on a joué tous les matchs clés) → on remplace
-  // le bouton par un message (le vrai bilan arrivera à l'étape suivante).
-  const saisonTerminee = journee > nbMatchs
   // On retrouve les infos du club (nom, couleurs, prestige) à partir de son id.
   // Le "!" dit à TypeScript "je garantis qu'il existe" (le club vient forcément des données).
   const club = CLUBS.find((c) => c.id === partie.clubId)!
@@ -78,18 +73,11 @@ export function HubSaison({
         </div>
       </header>
 
-      {/* Zone d'action : soit le bouton pour jouer le match clé en cours, soit un
-          message quand tous les matchs clés de la saison sont joués.
-          "condition ? (A) : (B)" = si la saison est finie on montre A, sinon B. */}
-      {saisonTerminee ? (
-        <p className="hub__saison-finie">
-          Tous les matchs clés sont joués — bilan de saison à venir.
-        </p>
-      ) : (
-        <button type="button" className="hub__jouer" onClick={onJouer}>
-          Jouer le match clé {journee} / {nbMatchs}
-        </button>
-      )}
+      {/* Bouton principal : jouer le prochain match (championnat ou finale). Le
+          libellé est fourni par le parent (App). */}
+      <button type="button" className="hub__jouer" onClick={onJouer}>
+        {labelBouton}
+      </button>
 
       {/* Les 4 jauges, chacune via le composant <Jauge />. */}
        {/* la fonction jauge se charge de l'affichage de chaque jauge, on lui passe le label et la valeur. */}

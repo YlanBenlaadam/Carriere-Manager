@@ -6,14 +6,55 @@ import { EcranBilan } from './ui/EcranBilan'
 import { EcranOffres } from './ui/EcranOffres'
 import { EcranFinCarriere } from './ui/EcranFinCarriere'
 import { creerPartie, terminerSaison, genererOffres, accepterOffre } from './game/carriere'
+import { competitionEuropeenne, choisirAdversaireFinale } from './game/coupe'
 import { creerRng } from './game/rng'
 import { CLUBS } from './data/clubs'
 import { EFFECTIFS } from './data/effectifs'
-import type { GameState, Jauges, ResultatRencontre, Bilan, Trophee, Club } from './game/types'
+import type { GameState, Jauges, ResultatRencontre, Bilan, Trophee, Club, Finale } from './game/types'
 import './App.css'
 
-// Nombre de matchs clés joués à la main dans une saison (le reste sera simulé).
+// Nombre de matchs de CHAMPIONNAT joués à la main dans une saison (le reste simulé).
 const NB_MATCHS_CLES = 5
+
+// Drapeau (emoji) de chaque championnat, pour illustrer le pays de la coupe nationale.
+const DRAPEAUX: Record<string, string> = {
+  France: '🇫🇷',
+  Angleterre: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  Espagne: '🇪🇸',
+  Italie: '🇮🇹',
+  Allemagne: '🇩🇪',
+}
+
+// Construit les finales de coupe de la saison (jouées après les matchs de championnat).
+// Toujours la coupe nationale ; + une coupe d'Europe selon le niveau du club.
+function construireFinales(partie: GameState): Finale[] {
+  const club = CLUBS.find((c) => c.id === partie.clubId)!
+  const rng = creerRng(partie.seed + partie.saison * 7)
+  const finales: Finale[] = []
+
+  // Coupe nationale : tout le monde la joue. On ajoute le drapeau du pays (= le
+  // championnat du club), car la finale se déroule dans ce pays.
+  const advCoupe = choisirAdversaireFinale('coupe_nationale', club, CLUBS, rng)
+  const drapeau = DRAPEAUX[club.championnat]
+  finales.push({
+    competition: 'coupe_nationale',
+    adversaireId: advCoupe.id,
+    titre: `Finale — Coupe nationale ${drapeau}`,
+  })
+
+  // Coupe d'Europe selon le prestige : Ligue des Champions, Europa League, ou aucune.
+  const euro = competitionEuropeenne(club.prestige)
+  if (euro !== null) {
+    const advEuro = choisirAdversaireFinale(euro, club, CLUBS, rng)
+    let titre = 'Finale — Europa League'
+    if (euro === 'ldc') {
+      titre = 'Finale — Ligue des Champions'
+    }
+    finales.push({ competition: euro, adversaireId: advEuro.id, titre })
+  }
+
+  return finales
+}
 
 function App() {
   // useState = la "mémoire" d'un composant. React redessine l'écran à chaque fois
@@ -39,6 +80,15 @@ function App() {
   // enOffres : affiche-t-on l'écran d'intersaison (offres) ?
   const [offres, setOffres] = useState<Club[]>([])
   const [enOffres, setEnOffres] = useState(false)
+  // tropheesSaison : trophées de coupe gagnés cette saison (ajoutés au palmarès au bilan).
+  const [tropheesSaison, setTropheesSaison] = useState<Trophee[]>([])
+
+  // Les finales de la saison (déterministes à partir de la partie) et le total de
+  // matchs clés (championnat + finales). journée > ce total → on va au bilan.
+  // en gros les finales sont calculées à partir de la partie (club, graine, saison) 
+  // et le total de matchs est le nombre de matchs clés + le nombre de finales.
+  const finales = partie !== undefined ? construireFinales(partie) : []
+  const totalMatchs = NB_MATCHS_CLES + finales.length
 
   // Appelée quand on clique un club : on crée la partie et on remet les compteurs
   // de saison à zéro (journée 1, aucun résultat encore).
@@ -48,16 +98,26 @@ function App() {
     setPartie(nouvellePartie)
     setJournee(1)
     setResultatsSaison([])
+    setTropheesSaison([])
   }
 
   // Fin d'un match : on enregistre les nouvelles jauges + notre résultat, on revient
   // au hub, et on passe à la journée suivante. { ...partie, jauges } = une COPIE de
   // la partie avec seulement les jauges remplacées (on ne modifie jamais l'original).
-  function finDeMatch(nouvellesJauges: Jauges, rencontre: ResultatRencontre) {
+  function finDeMatch(nouvellesJauges: Jauges, rencontre: ResultatRencontre, gagne: boolean) {
     if (partie !== undefined) {
       setPartie({ ...partie, jauges: nouvellesJauges })
     }
-    setResultatsSaison([...resultatsSaison, rencontre])
+
+    if (journee <= NB_MATCHS_CLES) {
+      // Match de championnat → son résultat compte pour le classement.
+      setResultatsSaison([...resultatsSaison, rencontre])
+    } else if (gagne && partie !== undefined) {
+      // Finale de coupe gagnée → un trophée pour le palmarès.
+      const finale = finales[journee - NB_MATCHS_CLES - 1]
+      setTropheesSaison([...tropheesSaison, { saison: partie.saison, competition: finale.competition }])
+    }
+
     setEnMatch(false)
     setJournee(journee + 1)
   }
@@ -69,7 +129,8 @@ function App() {
     if (partie === undefined) {
       return
     }
-    const trophees: Trophee[] = []
+    // Trophées de la saison : les coupes gagnées + le titre de champion si on finit 1er.
+    const trophees: Trophee[] = [...tropheesSaison]
     if (bilan.rangReel === 1) {
       trophees.push({ saison: partie.saison, competition: 'championnat' })
     }
@@ -95,10 +156,11 @@ function App() {
       // On change de club : nouvel effectif, jauges remises à neuf (voir accepterOffre).
       setPartie(accepterOffre(partie, choix, EFFECTIFS[choix]))
     }
-    // on repart pour une nouvelle saison (journée 1, résultats vidés) et on quitte l'écran d'offres.
+    // on repart pour une nouvelle saison (journée 1, résultats + trophées vidés).
     setEnOffres(false)
     setJournee(1)
     setResultatsSaison([])
+    setTropheesSaison([])
   }
 
   // Repartir d'une nouvelle carrière : on remet tous les états à leur valeur initiale.
@@ -111,6 +173,7 @@ function App() {
     setEcranChoix(false)
     setJournee(1)
     setResultatsSaison([])
+    setTropheesSaison([])
   }
 
   // 1) Une partie est en cours.
@@ -123,24 +186,42 @@ function App() {
     if (enOffres) {
       return <EcranOffres etat={partie} offres={offres} onChoisir={choisirOffre} />
     }
-    // 1b) On joue un match → l'écran de match.
+    // 1b) On joue un match. Si la journée dépasse le championnat, c'est une FINALE :
+    //     on passe la finale correspondante à l'écran de match (adversaire + thème).
     if (enMatch) {
-      return <EcranMatch partie={partie} journee={journee} onContinuer={finDeMatch} />
+      let finaleDuMatch: Finale | undefined = undefined
+      if (journee > NB_MATCHS_CLES) {
+        finaleDuMatch = finales[journee - NB_MATCHS_CLES - 1]
+      }
+      return (
+        <EcranMatch
+          partie={partie}
+          journee={journee}
+          finale={finaleDuMatch}
+          onContinuer={finDeMatch}
+        />
+      )
     }
-    // 1c) Tous les matchs clés joués → écran de bilan de saison.
-    if (journee > NB_MATCHS_CLES) {
+    // 1c) Championnat ET finales joués → écran de bilan de saison.
+    if (journee > totalMatchs) {
       return (
         <EcranBilan partie={partie} resultatsSaison={resultatsSaison} onTerminer={terminerLaSaison} />
       )
     }
-    // 1d) Sinon → le hub de saison.
+    // 1d) Sinon → le hub de saison. Le libellé du bouton dépend du prochain match
+    //     (match de championnat numéroté, ou finale de coupe).
+    //      finales[journee - NB_MATCHS_CLES - 1] = la finale correspondante à la journée (si on est dans les finales).
+    //      explication du calcul du label : si la journée est supérieure au nombre de matchs clés, 
+    //      on est dans les finales, donc on affiche le titre de la finale correspondante. 
+    //      Sinon, on affiche "Jouer le match clé X / NB_MATCHS_CLES".
+    // le tableau finales contient les finales de coupe de la saison, 
+    // et on calcule l'index de la finale correspondante à la journée actuelle en soustrayant NB_MATCHS_CLES + 1 (car les indices commencent à 0).
+    let labelProchain = `Jouer le match clé ${journee} / ${NB_MATCHS_CLES}`
+    if (journee > NB_MATCHS_CLES) {
+      labelProchain = finales[journee - NB_MATCHS_CLES - 1].titre
+    }
     return (
-      <HubSaison
-        partie={partie}
-        journee={journee}
-        nbMatchs={NB_MATCHS_CLES}
-        onJouer={() => setEnMatch(true)}
-      />
+      <HubSaison partie={partie} labelBouton={labelProchain} onJouer={() => setEnMatch(true)} />
     )
   }
 
