@@ -4,6 +4,7 @@ import { HubSaison } from './ui/HubSaison'
 import { EcranMatch } from './ui/EcranMatch'
 import { EcranBilan } from './ui/EcranBilan'
 import { EcranOffres } from './ui/EcranOffres'
+import { EcranFinCarriere } from './ui/EcranFinCarriere'
 import { creerPartie, terminerSaison, genererOffres, accepterOffre } from './game/carriere'
 import { creerRng } from './game/rng'
 import { CLUBS } from './data/clubs'
@@ -32,6 +33,8 @@ function App() {
   const [resultatsSaison, setResultatsSaison] = useState<ResultatRencontre[]>([])
   // carriereFinie : vrai quand la carrière est terminée (licencié ou 5 saisons).
   const [carriereFinie, setCarriereFinie] = useState(false)
+  // raisonFin : pourquoi la carrière s'est terminée (pour l'écran de fin).
+  const [raisonFin, setRaisonFin] = useState<'licencie' | 'fin_carriere' | null>(null)
   // offres : les clubs qui nous font une offre à l'intersaison (vide = aucune).
   // enOffres : affiche-t-on l'écran d'intersaison (offres) ?
   const [offres, setOffres] = useState<Club[]>([])
@@ -74,6 +77,7 @@ function App() {
     const resultat = terminerSaison(partie, bilan, trophees)
     setPartie(resultat.etat)
     if (resultat.finie) {
+      setRaisonFin(resultat.raison)
       setCarriereFinie(true)
     } else {
       // Pas finie → intersaison : on génère les offres (selon la nouvelle réputation)
@@ -101,6 +105,7 @@ function App() {
   function rejouer() {
     setPartie(undefined)
     setCarriereFinie(false)
+    setRaisonFin(null)
     setEnMatch(false)
     setEnOffres(false)
     setEcranChoix(false)
@@ -110,20 +115,9 @@ function App() {
 
   // 1) Une partie est en cours.
   if (partie !== undefined) {
-    // 1a) Carrière terminée → écran de fin (placeholder, enrichi à l'étape suivante).
+    // 1a) Carrière terminée → écran de fin (bilan global + partage).
     if (carriereFinie) {
-      return (
-        <main className="app">
-          <h1 className="app__titre">Carrière terminée</h1>
-          <p className="app__sous-titre">
-            {partie.saison} saison(s) jouée(s) · {partie.palmares.length} trophée(s) ·
-            réputation {partie.reputation}
-          </p>
-          <button type="button" className="app__cta" onClick={rejouer}>
-            Rejouer
-          </button>
-        </main>
-      )
+      return <EcranFinCarriere partie={partie} raison={raisonFin} onRejouer={rejouer} />
     }
     // 1a bis) Intersaison → écran des offres (rester ou changer de club).
     if (enOffres) {

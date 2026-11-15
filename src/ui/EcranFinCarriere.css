@@ -1,0 +1,103 @@
+/* Écran de fin de carrière. var(--...) = variables de index.css. */
+
+.fin {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: var(--esp-6) var(--esp-4);
+  text-align: center;
+}
+
+.fin__titre {
+  margin-bottom: var(--esp-5);
+}
+
+/* Les tuiles de stats, en grille responsive (auto-fit = autant que possible). */
+.fin__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-6);
+}
+.fin__stat {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--esp-4) var(--esp-2);
+  /* colonne centrée : la valeur en gros au-dessus du label. */
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+.fin__stat-valeur {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+.fin__stat-label {
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+}
+
+.fin__sous-titre {
+  text-align: left;
+  margin-bottom: var(--esp-3);
+}
+
+/* Tableau du parcours (border-collapse = bordures fusionnées). */
+.fin__parcours {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--esp-6);
+}
+.fin__parcours th,
+.fin__parcours td {
+  padding: var(--esp-2);
+  border-bottom: 1px solid var(--bordure);
+  text-align: center;
+}
+.fin__parcours th {
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.fin__col-club {
+  text-align: left;
+}
+
+/* Le bloc de résumé partageable. white-space: pre-wrap garde les retours à la ligne
+   du texte (les \n) et permet quand même le retour automatique si c'est trop long. */
+.fin__partage {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--esp-4);
+  text-align: left;
+  white-space: pre-wrap;
+  font-family: var(--police); /* on garde la police normale (pas du "code") */
+  color: var(--texte);
+  margin-bottom: var(--esp-4);
+}
+
+/* Les deux boutons côte à côte, centrés. flex-wrap : passent à la ligne si étroit. */
+.fin__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+}
+.fin__copier {
+  padding: var(--esp-4) var(--esp-5);
+  border-radius: var(--rayon);
+  font-weight: 700;
+}
+.fin__rejouer {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #06210f;
+  font-weight: 700;
+  padding: var(--esp-4) var(--esp-5);
+  border-radius: var(--rayon);
+}
+.fin__rejouer:hover {
+  background: var(--accent-fonce);
+  border-color: var(--accent-fonce);
+}
