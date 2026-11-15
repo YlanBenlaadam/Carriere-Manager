@@ -21,6 +21,7 @@ import type {
   Poste,
   Choice,
   Pronostic,
+  ResultatRencontre,
 } from '../game/types'
 import './EcranMatch.css'
 
@@ -38,6 +39,7 @@ interface Resolution {
   resultat: MatchResult
   recit: string
   nouvellesJauges: Jauges
+  rencontre: ResultatRencontre // notre résultat, pour le classement de fin de saison
 }
 
 // Prépare le match de la JOURNÉE donnée : adversaire, compositions, pronostic, choix.
@@ -134,7 +136,7 @@ export function EcranMatch({
 }: {
   partie: GameState
   journee: number // numéro du match clé dans la saison (1, 2, 3...)
-  onContinuer: (nouvellesJauges: Jauges) => void
+  onContinuer: (nouvellesJauges: Jauges, rencontre: ResultatRencontre) => void
 }) {
   // Préparation calculée UNE fois (l'initialiseur de useState ne tourne qu'au montage).
   // On ne veut pas recalculer à chaque re-render (ex. si on clique sur une option).
@@ -169,7 +171,15 @@ export function EcranMatch({
       nouvellesJauges = appliquerEffetsJauges(nouvellesJauges, option.effetsJauges)
     }
 
-    setResolution({ resultat, recit, nouvellesJauges })
+    // Notre résultat, formaté pour le classement : notre club "à domicile".
+    const rencontre: ResultatRencontre = {
+      domicile: partie.clubId,
+      exterieur: setup.adversaire.id,
+      butsDomicile: resultat.butsPour,
+      butsExterieur: resultat.butsContre,
+    }
+
+    setResolution({ resultat, recit, nouvellesJauges, rencontre })
   }
 
   // ---- Affichage APRÈS le match (si on a une résolution) ----
@@ -269,7 +279,7 @@ export function EcranMatch({
         <button
           type="button"
           className="match__continuer"
-          onClick={() => onContinuer(resolution.nouvellesJauges)}
+          onClick={() => onContinuer(resolution.nouvellesJauges, resolution.rencontre)}
         >
           Continuer
         </button>

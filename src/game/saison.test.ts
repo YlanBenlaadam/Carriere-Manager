@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { forceGlobale, simulerRencontre, simulerSaison, faireBilan } from './saison'
+import {
+  forceGlobale,
+  simulerRencontre,
+  simulerSaison,
+  faireBilan,
+  classementAvecResultatsJoueur,
+} from './saison'
 import { genererEffectif } from '../generation/genererEffectif'
 import { creerRng } from './rng'
-import type { LigneClassement, Player, Jauges } from './types'
+import type { LigneClassement, Player, Jauges, ResultatRencontre } from './types'
 
 // Construit des effectifs réalistes pour une liste de clubs (via le générateur).
 function effectifsPour(clubIds: string[], prestige: number): Record<string, Player[]> {
@@ -53,6 +59,24 @@ describe('simulerSaison', () => {
   })
 })
 
+describe('classementAvecResultatsJoueur', () => {
+  it('intègre notre résultat réel au classement (le reste est simulé)', () => {
+    const clubIds = ['a', 'b', 'c']
+    const effectifs = effectifsPour(clubIds, 60)
+    // Notre club 'a' a battu 'b' 3-0 (résultat réel du joueur).
+    const resultatsJoueur: ResultatRencontre[] = [
+      { domicile: 'a', exterieur: 'b', butsDomicile: 3, butsExterieur: 0 },
+    ]
+    const classement = classementAvecResultatsJoueur(clubIds, 'a', resultatsJoueur, effectifs, creerRng(1))
+
+    const a = classement.find((l) => l.clubId === 'a')!
+    const b = classement.find((l) => l.clubId === 'b')!
+    expect(classement.length).toBe(3)
+    expect(a.butsPour).toBeGreaterThanOrEqual(3) // le 3-0 est bien compté pour nous
+    expect(b.butsContre).toBeGreaterThanOrEqual(3) // ...et contre 'b'
+  })
+})
+
 describe('faireBilan', () => {
   // Petite ligne de classement minimale (seul le clubId compte pour le rang).
   function ligne(clubId: string): LigneClassement {
@@ -72,20 +96,21 @@ describe('faireBilan', () => {
   const jaugesOk: Jauges = { direction: 50, vestiaire: 50, fans: 50, tresorerie: 50 }
   const forces = { geant: 85, moyen: 65, petit: 50 } // attendu : geant, moyen, petit
 
-  it('surperformance : petit club fini 1er alors qu’attendu 3e → bonne note', () => {
-    // Classement réel : petit 1er, geant 2e, moyen 3e.
+  it('fini au niveau attendu ou mieux → excellente note (7 à 10)', () => {
+    // Classement réel : petit 1er, geant 2e, moyen 3e → petit attendu 3e, fini 1er.
     const classementReel = [ligne('petit'), ligne('geant'), ligne('moyen')]
-    const bilan = faireBilan('petit', classementReel, forces, jaugesOk)
+    const bilan = faireBilan('petit', classementReel, forces, jaugesOk, creerRng(1))
     expect(bilan.rangReel).toBe(1)
-    expect(bilan.rangAttendu).toBe(3) // petit = le plus faible → attendu dernier
-    expect(bilan.note).toBeGreaterThan(5.5) // mieux que prévu
+    expect(bilan.rangAttendu).toBe(3)
+    expect(bilan.note).toBeGreaterThanOrEqual(7) // palier "excellent"
+    expect(bilan.note).toBeLessThanOrEqual(10)
     expect(bilan.licencie).toBe(false)
   })
 
   it('licencié si une jauge est à 0', () => {
     const classementReel = [ligne('geant'), ligne('moyen'), ligne('petit')]
     const jaugesMortes: Jauges = { ...jaugesOk, fans: 0 }
-    const bilan = faireBilan('geant', classementReel, forces, jaugesMortes)
+    const bilan = faireBilan('geant', classementReel, forces, jaugesMortes, creerRng(1))
     expect(bilan.licencie).toBe(true)
   })
 })

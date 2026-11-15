@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { classementAttendu, rangDe, noteSurperformance } from './surperformance'
+import type { Rng } from './rng'
+
+// Faux rng : renvoie toujours la valeur fixée → note déterministe dans son palier.
+function rngFixe(valeur: number): Rng {
+  return () => valeur
+}
 
 describe('classementAttendu', () => {
   it('trie les clubs par force décroissante', () => {
@@ -21,22 +27,29 @@ describe('rangDe', () => {
 })
 
 describe('noteSurperformance', () => {
-  it('rang réel = rang attendu → note de base (5.5)', () => {
-    expect(noteSurperformance(5, 5)).toBe(5.5)
+  it('fini au rang attendu → palier excellent (7 à 10)', () => {
+    // rangReel = rangAttendu → ecart 0 → palier "7 à 10". rngFixe(0) donne le bas = 7.
+    expect(noteSurperformance(5, 5, rngFixe(0))).toBe(7)
+    expect(noteSurperformance(5, 5, rngFixe(0.5))).toBe(8.5)
   })
 
-  it('finir plus haut que prévu → note au-dessus de la base', () => {
-    // attendu 8e, fini 3e → écart +5 → 5.5 + 5*0.5 = 8
-    expect(noteSurperformance(3, 8)).toBe(8)
+  it('fini mieux que prévu → palier excellent aussi', () => {
+    // attendu 8e, fini 3e → ecart +5 >= 0 → 7 à 10.
+    const note = noteSurperformance(3, 8, rngFixe(0.5))
+    expect(note).toBeGreaterThanOrEqual(7)
+    expect(note).toBeLessThanOrEqual(10)
   })
 
-  it('finir plus bas que prévu → note en dessous de la base', () => {
-    // attendu 3e, fini 8e → écart -5 → 5.5 - 2.5 = 3
-    expect(noteSurperformance(8, 3)).toBe(3)
+  it('1 à 3 places sous l’attendu → palier moyen (5 à 6)', () => {
+    // attendu 5e, fini 7e → ecart -2 → 5 à 6. rngFixe(0) donne 5.
+    expect(noteSurperformance(7, 5, rngFixe(0))).toBe(5)
+    expect(noteSurperformance(7, 5, rngFixe(0.5))).toBe(5.5)
   })
 
-  it('reste bornée dans [0, 10]', () => {
-    expect(noteSurperformance(1, 20)).toBe(10) // surperformance énorme → plafond 10
-    expect(noteSurperformance(20, 1)).toBe(0) // effondrement → plancher 0
+  it('plus de 3 places sous l’attendu → palier raté (2 à 4.5)', () => {
+    // attendu 5e, fini 10e → ecart -5 → 2 à 4.5. rngFixe(0) donne 2.
+    expect(noteSurperformance(10, 5, rngFixe(0))).toBe(2)
+    const note = noteSurperformance(10, 5, rngFixe(0.99))
+    expect(note).toBeLessThan(5)
   })
 })

@@ -1,0 +1,16 @@
+a ajouter sur le site : (plus tard)
+note du coach entre 1 et 100 varie en fonction des jauges donc des résultats
+maybe enlever les jauges et garder que cette note qui augmente en cas de victoire ou diminue en cas de defaite (facilite de lisbilte)
+: mais pas forcement dependant ds jauges mais vraiment les résultats finalement il faudrais separer les 2 car 
+jauges varie en fonction des choix 
+notes coach varie en fonction des résultats -> note final transmis au joueur (victoire bonus et defaite malus)
+ajouter le fait de pouvoir faire les compos avant un match en sélectionnant manuellmet les joueurs dans l'effectif
+ajouter une boite mail avec des mail des dirigeant suivant les perfs satisfait ou pas 
+rendre le choix tactique obligatoire avant chaque match 
+rester equilibre : garde les forces comme tel
+       attaqueu : augmente la force offensive et baisse l'offensive (score avec bcp de buts dns tt les cas )	
+       defense : augmente la force defensive baisse l'offensive (score avec peu de buts dns tt les cas)
+
+
+prochaine session : revoir les prestiges des clubs
+revoir l'affichage du classement de fin de saison 

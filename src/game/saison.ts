@@ -69,6 +69,68 @@ export function simulerSaison(
   return { resultats, classement }
 }
 
+// Construit le classement du championnat en tenant compte des résultats RÉELS du
+// joueur (ses matchs clés), le reste des rencontres étant simulé automatiquement.
+// resultatsJoueur : nos résultats, chacun avec notre club en "domicile".
+export function classementAvecResultatsJoueur(
+  clubIds: string[],
+  monClubId: string,
+  resultatsJoueur: ResultatRencontre[],
+  effectifsParClub: Record<string, Player[]>,
+  rng: Rng,
+): LigneClassement[] {
+  // On indexe nos résultats par adversaire : adversaire → (nos buts, leurs buts).
+     /*
+      parAdversaire[r.exterieur] -> signifie que l'on associe à l'identifiant du club adverse (r.exterieur) un objet contenant nos buts et leurs buts pour ce match.
+       Cela permet de retrouver rapidement le résultat d'un match joué contre un adversaire spécifique.
+      Exemple : si notre club a joué contre "clubA" et a marqué 2 buts tandis que "clubA" en a marqué 1, 
+      alors parAdversaire["clubA"] sera { nosButs: 2, leursButs: 1 }.
+    */
+  const parAdversaire: Record<string, { nosButs: number; leursButs: number }> = {}
+  for (const r of resultatsJoueur) {
+    // Par construction, r.domicile est notre club ; l'adversaire est r.exterieur.
+    parAdversaire[r.exterieur] = { nosButs: r.butsDomicile, leursButs: r.butsExterieur }
+ 
+  }
+
+  // On parcourt tout le calendrier. Pour chaque rencontre, deux cas :
+  //  - c'est un de NOS matchs déjà joués → on réutilise notre résultat réel ;
+  //  - sinon → on simule la rencontre.
+  // explication du if : Si le club à domicile est notre club ET 
+  // que nous avons un résultat enregistré contre l'adversaire (le club à l'extérieur), 
+  // alors nous utilisons notre résultat réel. 
+  // Sinon, si le club à l'extérieur est notre club 
+  // ET que nous avons un résultat enregistré contre l'adversaire (le club à domicile), alors nous utilisons également notre résultat réel. 
+  // Dans tous les autres cas, nous simulons la rencontre.
+  const rencontres = genererCalendrier(clubIds)
+  const resultats: ResultatRencontre[] = []
+  for (const f of rencontres) {
+    if (f.domicile === monClubId && parAdversaire[f.exterieur] !== undefined) {
+      // Notre club est à domicile dans cette rencontre : orientation directe.
+      const mien = parAdversaire[f.exterieur]
+      resultats.push({
+        domicile: f.domicile,
+        exterieur: f.exterieur,
+        butsDomicile: mien.nosButs,
+        butsExterieur: mien.leursButs,
+      })
+    } else if (f.exterieur === monClubId && parAdversaire[f.domicile] !== undefined) {
+      // Notre club est à l'extérieur : on INVERSE (nos buts côté extérieur).
+      const mien = parAdversaire[f.domicile]
+      resultats.push({
+        domicile: f.domicile,
+        exterieur: f.exterieur,
+        butsDomicile: mien.leursButs,
+        butsExterieur: mien.nosButs,
+      }) // ici on passe dans le cas des matchs non jouer donc on simule le match
+    } else {
+      resultats.push(simulerRencontre(f, effectifsParClub, rng))
+    }
+  }
+
+  return calculerClassement(resultats)
+}
+
 // Fait le bilan de fin de saison pour LE club du joueur : compare son rang réel au
 // rang attendu (→ note de surperformance) et vérifie s'il est licencié.
 // Rappel : LigneClassement (types.ts) a un champ clubId ; Jauges a direction,
@@ -78,16 +140,23 @@ export function faireBilan(
   classementReel: LigneClassement[],
   forcesParClub: Record<string, number>,
   jauges: Jauges,
+  rng: Rng,
 ): Bilan {
   // Rang réel : position du club dans le classement (liste d'ids dans l'ordre).
+  // en gros ici on recupere le classement reel du club du joueur et on recupere son rang dans le classement
+  // donc id classes = on recupere le classement entier du championnat
+  // et rangReel = on recupere le rang du club du joueur dans le classement reel
+  // rq -> on pourrait juste stocker le classement dans idclasses mais 
+  // Cette ligne .map((ligne) => ligne.clubId) signifie que l'on parcourt chaque élément du tableau classementReel et
+  //  que l'on extrait la propriété clubId de chaque élément.
   const idsClasses = classementReel.map((ligne) => ligne.clubId)
   const rangReel = rangDe(idsClasses, clubId)
 
   // Rang attendu : position du club si on classe tout le monde par force.
   const rangAttendu = rangDe(classementAttendu(forcesParClub), clubId)
 
-  // Note de surperformance à partir de l'écart entre les deux rangs.
-  const note = noteSurperformance(rangReel, rangAttendu)
+  // Note à partir de l'écart entre les deux rangs (par paliers + un peu de hasard).
+  const note = noteSurperformance(rangReel, rangAttendu, rng)
 
   // Licencié dès qu'UNE jauge atteint 0 (règle v1 : licenciement = fin de carrière).
   const licencie =

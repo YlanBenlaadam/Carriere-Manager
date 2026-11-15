@@ -28,6 +28,7 @@ function ligneVide(clubId: string): LigneClassement {
 */
 export function calculerClassement(resultats: ResultatRencontre[]): LigneClassement[] {
   // Dictionnaire { clubId: sa ligne }, pour retrouver/mettre à jour facilement.
+  // string = id du club, LigneClassement = l'état du club (points, buts, etc.) à ce moment de la saison.
   const lignes: Record<string, LigneClassement> = {}
 
   // Petite fonction pour récupérer la ligne d'un club, en la créant si besoin.
@@ -70,10 +71,11 @@ export function calculerClassement(resultats: ResultatRencontre[]): LigneClassem
   }
 
   // On calcule la différence de buts et on transforme le dictionnaire en tableau.
+  // et bien sur c'est pour chaque rencontre que l'on calcule la différence de buts pour chaque club
   const classement: LigneClassement[] = []
   for (const clubId in lignes) {
     const ligne = lignes[clubId]
-    ligne.difference = ligne.butsPour - ligne.butsContre
+    ligne.difference = ligne.butsPour - ligne.butsContre // formule simple pour la différence de buts
     classement.push(ligne)
   }
 
