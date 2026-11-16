@@ -16,15 +16,6 @@ import './App.css'
 // Nombre de matchs de CHAMPIONNAT joués à la main dans une saison (le reste simulé).
 const NB_MATCHS_CLES = 5
 
-// Drapeau (emoji) de chaque championnat, pour illustrer le pays de la coupe nationale.
-const DRAPEAUX: Record<string, string> = {
-  France: '🇫🇷',
-  Angleterre: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  Espagne: '🇪🇸',
-  Italie: '🇮🇹',
-  Allemagne: '🇩🇪',
-}
-
 // Construit les finales de coupe de la saison (jouées après les matchs de championnat).
 // Toujours la coupe nationale ; + une coupe d'Europe selon le niveau du club.
 function construireFinales(partie: GameState): Finale[] {
@@ -32,14 +23,13 @@ function construireFinales(partie: GameState): Finale[] {
   const rng = creerRng(partie.seed + partie.saison * 7)
   const finales: Finale[] = []
 
-  // Coupe nationale : tout le monde la joue. On ajoute le drapeau du pays (= le
-  // championnat du club), car la finale se déroule dans ce pays.
+  // Coupe nationale : tout le monde la joue. Le drapeau du pays est ajouté à
+  // l'affichage par EcranMatch (dessiné en CSS), on garde donc un titre simple.
   const advCoupe = choisirAdversaireFinale('coupe_nationale', club, CLUBS, rng)
-  const drapeau = DRAPEAUX[club.championnat]
   finales.push({
     competition: 'coupe_nationale',
     adversaireId: advCoupe.id,
-    titre: `Finale — Coupe nationale ${drapeau}`,
+    titre: 'Finale — Coupe nationale',
   })
 
   // Coupe d'Europe selon le prestige : Ligue des Champions, Europa League, ou aucune.

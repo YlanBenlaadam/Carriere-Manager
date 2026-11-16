@@ -1,0 +1,44 @@
+/* Mini-drapeau national dessiné en CSS (remplace les emojis, mal rendus sous Windows). */
+
+.drapeau {
+  display: inline-flex; /* inline-flex : s'aligne dans le texte du titre ET range ses bandes */
+  width: 36px;
+  height: 24px;
+  border-radius: 3px;
+  overflow: hidden; /* coupe proprement les bandes aux coins arrondis */
+  border: 1px solid rgba(255, 255, 255, 0.25); /* fin liseré pour détacher le drapeau du fond sombre */
+  vertical-align: middle; /* centré verticalement par rapport au texte du titre */
+  margin-right: 8px; /* petit espace entre le drapeau et le titre */
+}
+
+/* Une bande : sa couleur et sa largeur (flexGrow) viennent du style inline.
+   Pas besoin de taille ici : flex étire chaque bande sur toute la hauteur/largeur. */
+.drapeau__bande {
+  display: block;
+}
+
+/* Drapeau à croix (Angleterre) : position:relative pour y poser les deux barres. */
+.drapeau--croix {
+  position: relative;
+}
+
+/* Barre horizontale de la croix : pleine largeur, centrée en hauteur.
+   translateY(-50%) recentre la barre sur son propre milieu (sinon elle démarre à 50%). */
+.drapeau__croix-h {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  transform: translateY(-50%);
+}
+
+/* Barre verticale de la croix : pleine hauteur, centrée en largeur. */
+.drapeau__croix-v {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  transform: translateX(-50%);
+}

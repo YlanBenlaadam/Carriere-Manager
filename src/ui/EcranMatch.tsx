@@ -10,6 +10,7 @@ import { raconterMatch } from '../game/recit'
 import { choixEligibles, tirerChoix, appliquerEffetsJauges } from '../game/choix'
 import { appliquerResultatAuxJauges } from '../game/jauges'
 import { creerRng } from '../game/rng'
+import { Drapeau, pelouseDuPays } from './Drapeau'
 import type {
   GameState,
   Jauges,
@@ -63,6 +64,7 @@ function preparerMatch(partie: GameState, journee: number, adversaireImpose?: st
     const adversairesPossibles = CLUBS.filter(
       (c) => c.championnat === monClub.championnat && c.id !== partie.clubId,
     )
+    // On tire l'adversaire de la journée en fonction du numéro de journée (stable).
     const indexAdversaire = (journee - 1) % adversairesPossibles.length
     adversaire = adversairesPossibles[indexAdversaire]
   }
@@ -151,9 +153,13 @@ export function EcranMatch({
   onContinuer: (nouvellesJauges: Jauges, rencontre: ResultatRencontre, gagne: boolean) => void
 }) {
   // Adversaire imposé si c'est une finale (sinon undefined → adversaire de championnat).
+  //explication  adversaireImpose = finale signifie que si on est en finale (finale !== undefined), on prend l'adversaire de la finale, 
+  // sinon on prend l'adversaire du championnat
+  // en java se serait : if (finale != null) { adversaireImpose = finale.adversaireId } else { adversaireImpose = null }
   const adversaireImpose = finale !== undefined ? finale.adversaireId : undefined
 
   // Thème visuel : 'championnat' par défaut, sinon la compétition de la finale.
+  // en java sa serait if (finale != null) { theme = finale.competition } else { theme = 'championnat' }
   const theme = finale !== undefined ? finale.competition : 'championnat'
   const classeRacine = 'match match--' + theme
 
@@ -166,6 +172,38 @@ export function EcranMatch({
   const [resolution, setResolution] = useState<Resolution | undefined>(undefined)
 
   const monClub = CLUBS.find((c) => c.id === partie.clubId)!
+
+  // Est-on en finale de COUPE NATIONALE ? (pour afficher le drapeau + teinter la pelouse)
+  //  const estCoupeNationale = finale !== undefined signifie qu'on est en finale et finale.competition === 'coupe_nationale' 
+  // signifie que c'est une coupe nationale
+  // le !== undefined est important car si finale est undefined, 
+  // on ne peut pas accéder à finale.competition, donc on vérifie d'abord que finale n'est pas undefined avant de vérifier la compétition
+  // en java sa serait :
+  // if (finale != null && finale.competition.equals("coupe_nationale")) { estCoupeNationale = true } else { estCoupeNationale = false }
+  const estCoupeNationale = finale !== undefined && finale.competition === 'coupe_nationale'
+
+  // Bannière de compétition (uniquement pour une finale). Pour la coupe nationale, on
+  // précède le titre du vrai drapeau du pays (dessiné en CSS, pas un emoji). Calculée
+  // une fois ici pour être réutilisée dans les deux rendus (avant / après match).
+  // en gros si on est en finale, on affiche le titre de la finale et si c'est une coupe nationale,
+  //  on affiche le drapeau du pays avant le titre
+  const banniereCompet =
+    finale !== undefined ? (
+      <p className="match__competition">
+        {estCoupeNationale && <Drapeau championnat={monClub.championnat} />}
+        {finale.titre}
+      </p>
+    ) : null
+
+  // Pelouse : en coupe nationale, teintée aux couleurs du pays (style inline) ; sinon
+  // undefined → c'est le thème CSS (.match--ldc, .match--europa, ou le vert par défaut).
+  let stylePelouse: { background: string } | undefined = undefined
+  if (estCoupeNationale) {
+    const fond = pelouseDuPays(monClub.championnat)
+    if (fond !== undefined) {
+      stylePelouse = { background: fond }
+    }
+  }
 
   // Joue le match avec l'option choisie (ou undefined si pas de choix), puis calcule
   // le récit et les nouvelles jauges. C'est le moment du tirage (une seule fois).
@@ -255,8 +293,8 @@ export function EcranMatch({
 
     return (
       <div className={classeRacine}>
-        {/* Bannière de compétition (seulement pour une finale de coupe). */}
-        {finale !== undefined && <p className="match__competition">{finale.titre}</p>}
+        {/* Bannière de compétition (drapeau + titre pour la coupe nationale). */}
+        {banniereCompet}
         <p className="match__fin">Fin du match</p>
         <h1 className="match__score">
           {resultat.butsPour} – {resultat.butsContre}
@@ -276,7 +314,7 @@ export function EcranMatch({
             gauche → attaque vers le centre), une ligne médiane verticale, puis
             l'adversaire à droite (attaque vers le centre → gardien à l'extrême
             droite), comme un écran de match classique. */}
-        <div className="terrain">
+        <div className="terrain" style={stylePelouse}>
           {rangee(nous, 'G', false)}
           {rangee(nous, 'D', false)}
           {rangee(nous, 'M', false)}
@@ -331,8 +369,8 @@ export function EcranMatch({
   // ---- Affichage AVANT le match : pronostic + choix ----
   return (
     <div className={classeRacine}>
-      {/* Bannière de compétition (seulement pour une finale de coupe). */}
-      {finale !== undefined && <p className="match__competition">{finale.titre}</p>}
+      {/* Bannière de compétition (drapeau + titre pour la coupe nationale). */}
+      {banniereCompet}
       <p className="match__affiche">
         {monClub.nom} <span className="match__vs">vs</span> {setup.adversaire.nom}
       </p>
