@@ -1,0 +1,20 @@
+# Configuration de déploiement Netlify.
+# Netlify lit ce fichier à chaque build déclenché par un push GitHub.
+
+[build]
+  # Commande qui fabrique le site (tsc + vite build, voir package.json).
+  command = "npm run build"
+  # Dossier produit par le build, que Netlify met en ligne.
+  publish = "dist"
+
+[build.environment]
+  # Version de Node utilisée pour le build (Vite 8 exige un Node récent).
+  NODE_VERSION = "22"
+
+# Filet de sécurité "single page app" : on renvoie toujours index.html (code 200)
+# quelle que soit l'URL demandée. Utile le jour où on ajoutera de la navigation
+# par URL ; aujourd'hui le site tient sur une seule page, donc ça ne gêne rien.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
