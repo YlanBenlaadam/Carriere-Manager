@@ -101,3 +101,16 @@
   background: var(--accent-fonce);
   border-color: var(--accent-fonce);
 }
+
+/* Boutons désactivés pendant la génération de l'image (curseur + opacité). */
+.fin__actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Petit message de statut sous les boutons (téléchargé / partagé...). */
+.fin__statut {
+  margin-top: var(--esp-3);
+  color: var(--texte-doux);
+  font-size: 0.9rem;
+}

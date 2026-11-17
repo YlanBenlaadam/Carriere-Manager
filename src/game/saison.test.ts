@@ -99,7 +99,7 @@ describe('faireBilan', () => {
   it('fini au niveau attendu ou mieux → excellente note (7 à 10)', () => {
     // Classement réel : petit 1er, geant 2e, moyen 3e → petit attendu 3e, fini 1er.
     const classementReel = [ligne('petit'), ligne('geant'), ligne('moyen')]
-    const bilan = faireBilan('petit', classementReel, forces, jaugesOk, creerRng(1))
+    const bilan = faireBilan('petit', classementReel, [], forces, jaugesOk, creerRng(1))
     expect(bilan.rangReel).toBe(1)
     expect(bilan.rangAttendu).toBe(3)
     expect(bilan.note).toBeGreaterThanOrEqual(7) // palier "excellent"
@@ -110,7 +110,7 @@ describe('faireBilan', () => {
   it('licencié si une jauge est à 0', () => {
     const classementReel = [ligne('geant'), ligne('moyen'), ligne('petit')]
     const jaugesMortes: Jauges = { ...jaugesOk, fans: 0 }
-    const bilan = faireBilan('geant', classementReel, forces, jaugesMortes, creerRng(1))
+    const bilan = faireBilan('geant', classementReel, [], forces, jaugesMortes, creerRng(1))
     expect(bilan.licencie).toBe(true)
   })
 })

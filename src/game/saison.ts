@@ -12,8 +12,8 @@ import { calculerForces } from './force'
 import { jouerMatch } from './match'
 import { genererCalendrier } from './calendrier'
 import { calculerClassement } from './classement'
-import { classementAttendu, rangDe, noteSurperformance } from './surperformance'
-
+import { classementAttendu, rangDe, noteSurperformance, bonusPalmaresSaison } from './surperformance'
+import type { Trophee } from './types'
 // Force "globale" d'un club = moyenne de l'attaque et de la défense de son meilleur
 // XI. Sert au classement ATTENDU (clubs triés par force).
 // Rappel : calculerForces (force.ts) renvoie des Forces = { attaque, defense }.
@@ -138,6 +138,7 @@ export function classementAvecResultatsJoueur(
 export function faireBilan(
   clubId: string,
   classementReel: LigneClassement[],
+  tropheesSaison: Trophee[],
   forcesParClub: Record<string, number>,
   jauges: Jauges,
   rng: Rng,
@@ -155,8 +156,9 @@ export function faireBilan(
   // Rang attendu : position du club si on classe tout le monde par force.
   const rangAttendu = rangDe(classementAttendu(forcesParClub), clubId)
 
-  // Note : mélange place absolue + surperformance (nbClubs = taille du championnat).
-  const note = noteSurperformance(rangReel, rangAttendu, classementReel.length, rng)
+  const noteBrute = noteSurperformance(rangReel, rangAttendu, classementReel.length, rng)
+  // on ajoute le bonus, on re-borne à 10, on garde 1 décimale
+  const note = Math.min(10, Math.round((noteBrute + bonusPalmaresSaison(tropheesSaison)) * 10) / 10)
 
   // Licencié dès qu'UNE jauge atteint 0 (règle v1 : licenciement = fin de carrière).
   const licencie =

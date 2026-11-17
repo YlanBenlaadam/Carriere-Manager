@@ -2,6 +2,7 @@
 // l'effectif laissait attendre ? On compare le rang réel au rang attendu.
 
 import type { Rng } from './rng'
+import type {Trophee,TypeTrophee} from './types'
 
 // Classement ATTENDU : les clubs triés par force décroissante (le plus fort 1er).
 // Entrée : un dictionnaire { clubId: force globale }. Sortie : les ids ordonnés.
@@ -61,4 +62,23 @@ export function noteSurperformance(
     note = 10
   }
   return Math.round(note * 10) / 10
+}
+// Poids d'un trophée sur la note de saison (comme +0.6/but, +0.4/passe du joueur).
+// championnat = 0 : finir 1er est DÉJÀ récompensé par la surperformance (sinon on
+// compterait la même chose deux fois). À TOI d'ajuster ces poids au playtest.
+const POIDS_TROPHEE: Record<TypeTrophee, number> = {
+  championnat: 0,
+  coupe_nationale: 0.5,
+  europa: 0.8,
+  ldc: 1.3,
+}
+
+
+export function bonusPalmaresSaison(trophees: Trophee[]): number {
+  let bonus = 0 
+	for(let i = 0; i<trophees.length; i++){
+		const competition = trophees[i].competition ;
+		bonus+= POIDS_TROPHEE[competition];
+	}
+	return bonus
 }

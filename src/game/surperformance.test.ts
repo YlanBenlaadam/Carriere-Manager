@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { classementAttendu, rangDe, noteSurperformance } from './surperformance'
+import { classementAttendu, rangDe, noteSurperformance, bonusPalmaresSaison } from './surperformance'
 import type { Rng } from './rng'
+import type { Trophee } from './types'
 
 // Faux rng : renvoie toujours la valeur fixée → note déterministe dans son palier.
 function rngFixe(valeur: number): Rng {
@@ -50,5 +51,30 @@ describe('noteSurperformance', () => {
   it('reste bornée dans [1, 10]', () => {
     expect(noteSurperformance(1, 10, 10, rngFixe(0.99))).toBeLessThanOrEqual(10)
     expect(noteSurperformance(10, 1, 10, rngFixe(0))).toBeGreaterThanOrEqual(1)
+  })
+})
+
+describe('bonusPalmaresSaison', () => {
+  // Petit raccourci pour fabriquer un trophée (la saison n'importe pas ici).
+  function trophee(competition: Trophee['competition']): Trophee {
+    return { saison: 1, competition }
+  }
+
+  it('aucun trophée → bonus nul', () => {
+    expect(bonusPalmaresSaison([])).toBe(0)
+  })
+
+  it('le titre de champion ne donne pas de bonus (déjà pris par la surperformance)', () => {
+    expect(bonusPalmaresSaison([trophee('championnat')])).toBe(0)
+  })
+
+  it('additionne les poids par type de coupe', () => {
+    // coupe nationale (0.5) + Europa (0.8) + LDC (1.3) = 2.6
+    const bonus = bonusPalmaresSaison([
+      trophee('coupe_nationale'),
+      trophee('europa'),
+      trophee('ldc'),
+    ])
+    expect(bonus).toBeCloseTo(2.6)
   })
 })

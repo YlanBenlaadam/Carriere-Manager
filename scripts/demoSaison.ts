@@ -44,7 +44,8 @@ classement.forEach((ligne, index) => {
 // --- Bilan pour un club modeste (Reims) ---
 const monClub = 'reims'
 const jauges: Jauges = { direction: 50, vestiaire: 50, fans: 50, tresorerie: 50 }
-const bilan = faireBilan(monClub, classement, forces, jauges, rng)
+// [] = aucun trophée de coupe cette saison dans cette démo (nouvel argument de faireBilan).
+const bilan = faireBilan(monClub, classement, [], forces, jauges, rng)
 
 console.log(`\n=== Bilan de ${nomDe(monClub)} ===`)
 console.log(`Rang réel : ${bilan.rangReel}e  |  Rang attendu : ${bilan.rangAttendu}e`)

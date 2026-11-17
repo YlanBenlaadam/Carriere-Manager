@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { CLUBS } from '../data/clubs'
 import { EFFECTIFS } from '../data/effectifs'
 import { classementAvecResultatsJoueur, forceGlobale, faireBilan } from '../game/saison'
+import { bonusPalmaresSaison } from '../game/surperformance'
 import { creerRng } from '../game/rng'
-import type { GameState, ResultatRencontre, Player, LigneClassement, Bilan } from '../game/types'
+import type { GameState, ResultatRencontre, Player, LigneClassement, Bilan, Trophee } from '../game/types'
 import './EcranBilan.css'
 
 // Ce qu'on calcule une fois pour l'affichage du bilan.
@@ -13,7 +14,11 @@ interface DonneesBilan {
 }
 
 // Assemble le classement final (nos résultats + reste simulé) et le bilan du joueur.
-function calculerBilanSaison(partie: GameState, resultatsSaison: ResultatRencontre[]): DonneesBilan {
+function calculerBilanSaison(
+  partie: GameState,
+  resultatsSaison: ResultatRencontre[],
+  tropheesSaison: Trophee[],
+): DonneesBilan {
   const monClub = CLUBS.find((c) => c.id === partie.clubId)!
   const clubIds = CLUBS.filter((c) => c.championnat === monClub.championnat).map((c) => c.id) // tous les clubs du championnat de NOTRE club
 
@@ -37,7 +42,7 @@ function calculerBilanSaison(partie: GameState, resultatsSaison: ResultatRencont
     forcesParClub[id] = forceGlobale(effectifsParClub[id])
   }
 
-  const bilan = faireBilan(partie.clubId, classement, forcesParClub, partie.jauges, rng)
+  const bilan = faireBilan(partie.clubId, classement, tropheesSaison, forcesParClub, partie.jauges, rng)
   return { classement, bilan }
 }
 
@@ -46,15 +51,21 @@ function calculerBilanSaison(partie: GameState, resultatsSaison: ResultatRencont
 export function EcranBilan({
   partie,
   resultatsSaison,
+  tropheesSaison,
   onTerminer,
 }: {
   partie: GameState
   resultatsSaison: ResultatRencontre[]
+  tropheesSaison: Trophee[]
   onTerminer: (bilan: Bilan) => void
 }) {
   // Calcul fait UNE fois au montage (initialiseur de useState).
-  const [donnees] = useState(() => calculerBilanSaison(partie, resultatsSaison))
+  const [donnees] = useState(() => calculerBilanSaison(partie, resultatsSaison, tropheesSaison))
   const { classement, bilan } = donnees
+
+  // Bonus de note dû aux coupes gagnées cette saison (pour l'afficher explicitement).
+  const bonusCoupes = bonusPalmaresSaison(tropheesSaison)
+  const bonusCoupesTexte = bonusCoupes.toFixed(1).replace('.', ',') // format FR "1,3"
 
   // Nom lisible d'un club depuis son id.
   function nomDe(id: string): string {
@@ -84,6 +95,12 @@ export function EcranBilan({
         <span className="bilan__note-label">/ 10</span>
       </div>
       <p className="bilan__rangs">Classé {bilan.rangReel}ᵉ du championnat</p>
+
+      {/* Transparence : si des coupes ont été gagnées, on affiche le bonus ajouté
+          à la note (rendu conditionnel : seulement quand le bonus est > 0). */}
+      {bonusCoupes > 0 && (
+        <p className="bilan__bonus">🏆 dont +{bonusCoupesTexte} grâce aux coupes gagnées</p>
+      )}
 
       {/* Le classement final du championnat (notre ligne surlignée). */}
       <table className="classement">

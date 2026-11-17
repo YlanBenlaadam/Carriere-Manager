@@ -37,6 +37,13 @@
 
 .bilan__rangs {
   color: var(--texte-doux);
+  margin-bottom: var(--esp-3);
+}
+
+/* Ligne du bonus de coupes (doré, comme les trophées). */
+.bilan__bonus {
+  color: var(--or);
+  font-weight: 600;
   margin-bottom: var(--esp-5);
 }
 

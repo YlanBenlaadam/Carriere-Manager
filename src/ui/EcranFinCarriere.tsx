@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { CLUBS } from '../data/clubs'
 import { compterTrophees } from '../game/palmares'
+import { construireSvgFiche, svgVersPngBlob, telechargerBlob, partagerFiche } from './ficheBilan'
+import type { DonneesFiche } from './ficheBilan'
 import type { GameState } from '../game/types'
 import './EcranFinCarriere.css'
 
@@ -18,6 +20,9 @@ export function EcranFinCarriere({
   // Petit état local pour afficher "Copié !" après un clic sur le bouton copier.
   // en gorss, on ne fait que changer le texte du bouton après un clic, puis on le remet à "Copier" au prochain rendu.
   const [copie, setCopie] = useState(false)
+  // État des actions sur la fiche image : '' (rien), 'travail' (génération en cours),
+  // puis le résultat ('telecharge', 'partage', ou 'copie' en repli presse-papier).
+  const [etatImage, setEtatImage] = useState<'' | 'travail' | 'telecharge' | 'partage' | 'copie'>('')
 
   function nomDe(id: string): string {
     return CLUBS.find((c) => c.id === id)!.nom
@@ -37,7 +42,7 @@ export function EcranFinCarriere({
   }
 
   const nbTrophees = partie.palmares.length
-  const titres = compterTrophees(partie.palmares, 'championnat')
+  const titres = compterTrophees(partie.palmares, 'championnat') + compterTrophees(partie.palmares, 'ldc') + compterTrophees(partie.palmares, 'europa')+ compterTrophees(partie.palmares, 'coupe_nationale')
   const nomClubActuel = nomDe(partie.clubId)
 
   // Titre selon la raison de fin.
@@ -68,6 +73,60 @@ export function EcranFinCarriere({
       return 'var(--or)'
     }
     return 'var(--danger)'
+  }
+
+  // --- Données pour la FICHE IMAGE téléchargeable/partageable. ---
+  // Le club actuel (pour les couleurs de la pastille dessinée sur la carte).
+  const clubActuel = CLUBS.find((c) => c.id === partie.clubId)!
+
+  // Lignes de palmarès : on compte chaque type de trophée et on ne garde que
+  // celles qui ont au moins 1 (pas de ligne "×0").
+  const lignesPalmares = [
+    { label: 'Champion', nombre: compterTrophees(partie.palmares, 'championnat') },
+    { label: 'Coupe nationale', nombre: compterTrophees(partie.palmares, 'coupe_nationale') },
+    { label: 'Ligue des Champions', nombre: compterTrophees(partie.palmares, 'ldc') },
+    { label: 'Europa League', nombre: compterTrophees(partie.palmares, 'europa') },
+  ].filter((ligne) => ligne.nombre > 0)
+
+  const donneesFiche: DonneesFiche = {
+    titreClub: nomClubActuel,
+    couleurClub: clubActuel.couleurs.principale,
+    couleurClubBordure: clubActuel.couleurs.secondaire,
+    nbSaisons,
+    noteMoyenne,
+    nbTrophees,
+    reputation: partie.reputation,
+    palmares: lignesPalmares,
+  }
+
+  // Télécharge la fiche en PNG (génère le SVG → PNG → déclenche le téléchargement).
+  async function telechargerFiche() {
+    setEtatImage('travail')
+    try {
+      const blob = await svgVersPngBlob(construireSvgFiche(donneesFiche))
+      telechargerBlob(blob, 'carriere-manager.png')
+      setEtatImage('telecharge')
+    } catch {
+      setEtatImage('')
+    }
+  }
+
+  // Partage la fiche via le menu natif (repli = copie du texte).
+  async function partager() {
+    setEtatImage('travail')
+    try {
+      const blob = await svgVersPngBlob(construireSvgFiche(donneesFiche))
+      const resultat = await partagerFiche(blob, 'carriere-manager.png', resumePartage)
+      if (resultat === 'partage') {
+        setEtatImage('partage')
+      } else if (resultat === 'copie') {
+        setEtatImage('copie')
+      } else {
+        setEtatImage('')
+      }
+    } catch {
+      setEtatImage('')
+    }
   }
 
   return (
@@ -119,17 +178,41 @@ export function EcranFinCarriere({
         </tbody>
       </table>
 
-      {/* Résumé partageable + bouton copier. */}
-      <h2 className="fin__sous-titre">Partager</h2>
+      {/* Partager ma carrière : partage natif + fiche image téléchargeable. */}
+      <h2 className="fin__sous-titre">Partager ma carrière</h2>
       <pre className="fin__partage">{resumePartage}</pre>
       <div className="fin__actions">
-        <button type="button" className="fin__copier" onClick={copier}>
-          {copie ? 'Copié ✅' : 'Copier le résumé'}
+        <button
+          type="button"
+          className="fin__rejouer"
+          onClick={partager}
+          disabled={etatImage === 'travail'}
+        >
+          📤 Partager
         </button>
-        <button type="button" className="fin__rejouer" onClick={onRejouer}>
+        <button
+          type="button"
+          className="fin__copier"
+          onClick={telechargerFiche}
+          disabled={etatImage === 'travail'}
+        >
+          ⬇️ Télécharger la fiche
+        </button>
+        <button type="button" className="fin__copier" onClick={copier}>
+          {copie ? 'Copié ✅' : 'Copier le texte'}
+        </button>
+        <button type="button" className="fin__copier" onClick={onRejouer}>
           Rejouer
         </button>
       </div>
+
+      {/* Retour visuel selon l'action image (génération / résultat). */}
+      {etatImage === 'travail' && <p className="fin__statut">Génération de la fiche…</p>}
+      {etatImage === 'telecharge' && <p className="fin__statut">Fiche téléchargée ✅</p>}
+      {etatImage === 'partage' && <p className="fin__statut">Partagé ✅</p>}
+      {etatImage === 'copie' && (
+        <p className="fin__statut">Partage d'image indisponible ici — résumé copié ✅</p>
+      )}
     </div>
   )
 }

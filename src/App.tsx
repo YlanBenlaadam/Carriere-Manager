@@ -14,7 +14,7 @@ import type { GameState, Jauges, ResultatRencontre, Bilan, Trophee, Club, Finale
 import './App.css'
 
 // Nombre de matchs de CHAMPIONNAT joués à la main dans une saison (le reste simulé).
-const NB_MATCHS_CLES = 5
+const NB_MATCHS_CLES = 1
 
 // Construit les finales de coupe de la saison (jouées après les matchs de championnat).
 // Toujours la coupe nationale ; + une coupe d'Europe selon le niveau du club.
@@ -195,7 +195,12 @@ function App() {
     // 1c) Championnat ET finales joués → écran de bilan de saison.
     if (journee > totalMatchs) {
       return (
-        <EcranBilan partie={partie} resultatsSaison={resultatsSaison} onTerminer={terminerLaSaison} />
+        <EcranBilan
+          partie={partie}
+          resultatsSaison={resultatsSaison}
+          tropheesSaison={tropheesSaison}
+          onTerminer={terminerLaSaison}
+        />
       )
     }
     // 1d) Sinon → le hub de saison. Le libellé du bouton dépend du prochain match
