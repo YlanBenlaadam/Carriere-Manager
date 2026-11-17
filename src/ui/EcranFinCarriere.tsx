@@ -82,7 +82,7 @@ export function EcranFinCarriere({
   // Lignes de palmarès : on compte chaque type de trophée et on ne garde que
   // celles qui ont au moins 1 (pas de ligne "×0").
   const lignesPalmares = [
-    { label: 'Champion', nombre: compterTrophees(partie.palmares, 'championnat') },
+    { label: 'Championnat', nombre: compterTrophees(partie.palmares, 'championnat') },
     { label: 'Coupe nationale', nombre: compterTrophees(partie.palmares, 'coupe_nationale') },
     { label: 'Ligue des Champions', nombre: compterTrophees(partie.palmares, 'ldc') },
     { label: 'Europa League', nombre: compterTrophees(partie.palmares, 'europa') },
