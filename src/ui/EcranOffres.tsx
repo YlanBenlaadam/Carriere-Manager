@@ -34,6 +34,8 @@ export function EcranOffres({
         <>
           <h2 className="offres__h2">Clubs intéressés</h2>
           <div className="offres__liste">
+            {/*ici on parcourt le tableau des offres et pour chaque club on cree un bouton avec les infos du club (nom, etoiles, couleurs)
+               et on appelle la fonction onChoisir avec l'id du club quand on clique sur le bouton*/}
             {offres.map((club) => (
               <button
                 type="button"

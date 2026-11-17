@@ -14,3 +14,7 @@ rester equilibre : garde les forces comme tel
 
 prochaine session : revoir les prestiges des clubs
 revoir l'affichage du classement de fin de saison 
+
+l'affichage pour ldc -> pas mal
+affichage Europa league -> a consulter demain 
+affichage Coupe national -> drapeau mal afficher manque de caractere dans les couleurs

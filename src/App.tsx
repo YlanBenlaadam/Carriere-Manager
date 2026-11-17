@@ -246,7 +246,9 @@ function App() {
         ▶ Regarder le tuto
       </button>
 
-      {/* L'overlay vidéo, affiché seulement si tuto === true. */}
+      {/* L'overlay vidéo, affiché seulement si tuto === true. 
+          si la fonction onFermer est appelée (clic sur le fond ou sur la croix), on met tuto à false, ce qui ferme l'overlay.
+      */}
       {tuto && <TutoVideo onFermer={() => setTuto(false)} />}
     </main>
   )
