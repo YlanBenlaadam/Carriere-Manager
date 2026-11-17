@@ -5,6 +5,7 @@ import { EcranMatch } from './ui/EcranMatch'
 import { EcranBilan } from './ui/EcranBilan'
 import { EcranOffres } from './ui/EcranOffres'
 import { EcranFinCarriere } from './ui/EcranFinCarriere'
+import { TutoVideo } from './ui/TutoVideo'
 import { creerPartie, terminerSaison, genererOffres, accepterOffre } from './game/carriere'
 import { competitionEuropeenne, choisirAdversaireFinale } from './game/coupe'
 import { creerRng } from './game/rng'
@@ -14,7 +15,7 @@ import type { GameState, Jauges, ResultatRencontre, Bilan, Trophee, Club, Finale
 import './App.css'
 
 // Nombre de matchs de CHAMPIONNAT joués à la main dans une saison (le reste simulé).
-const NB_MATCHS_CLES = 1
+const NB_MATCHS_CLES = 5
 
 // Construit les finales de coupe de la saison (jouées après les matchs de championnat).
 // Toujours la coupe nationale ; + une coupe d'Europe selon le niveau du club.
@@ -72,6 +73,8 @@ function App() {
   const [enOffres, setEnOffres] = useState(false)
   // tropheesSaison : trophées de coupe gagnés cette saison (ajoutés au palmarès au bilan).
   const [tropheesSaison, setTropheesSaison] = useState<Trophee[]>([])
+  // tuto : affiche-t-on l'overlay de la vidéo tuto (depuis l'écran d'accueil) ?
+  const [tuto, setTuto] = useState(false)
 
   // Les finales de la saison (déterministes à partir de la partie) et le total de
   // matchs clés (championnat + finales). journée > ce total → on va au bilan.
@@ -236,6 +239,15 @@ function App() {
       <button type="button" className="app__cta" onClick={() => setEcranChoix(true)}>
         Nouvelle partie
       </button>
+      {/* Bouton secondaire : ouvre la vidéo tuto dans un overlay. 
+          a chaque clic on met tuto à true, ce qui déclenche l'affichage de l'overlay.
+      */}
+      <button type="button" className="app__tuto" onClick={() => setTuto(true)}>
+        ▶ Regarder le tuto
+      </button>
+
+      {/* L'overlay vidéo, affiché seulement si tuto === true. */}
+      {tuto && <TutoVideo onFermer={() => setTuto(false)} />}
     </main>
   )
 }

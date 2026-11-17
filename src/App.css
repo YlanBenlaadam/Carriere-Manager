@@ -40,3 +40,16 @@
   background: var(--accent-fonce);
   border-color: var(--accent-fonce);
 }
+
+/* Bouton secondaire "tuto" : discret (fond de surface), sous le bouton principal.
+   On retire la marge haute du gap par défaut : le gap de .app gère déjà l'espacement. */
+.app__tuto {
+  background: var(--surface);
+  border-color: var(--bordure);
+  color: var(--texte);
+  padding: var(--esp-3) var(--esp-5);
+  border-radius: var(--rayon);
+}
+.app__tuto:hover {
+  background: var(--surface-2);
+}

@@ -1,0 +1,48 @@
+/* Overlay (modale) de lecture du tuto vidéo. var(--...) = tokens de index.css. */
+
+.tuto {
+  position: fixed;
+  inset: 0; /* raccourci pour top/right/bottom/left: 0 → couvre tout l'écran */
+  background: rgba(0, 0, 0, 0.8); /* fond noir semi-transparent (voile) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--esp-4);
+  z-index: 100; /* au-dessus de tout le reste de l'app */
+}
+
+/* Le cadre qui contient la vidéo : centré, largeur limitée, position:relative pour
+   pouvoir y ancrer le bouton de fermeture en absolu. */
+.tuto__cadre {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+}
+
+.tuto__video {
+  width: 100%;
+  display: block;
+  border-radius: var(--rayon);
+  border: 1px solid var(--bordure);
+  box-shadow: var(--ombre);
+  background: #000; /* bandes noires éventuelles pendant le chargement */
+}
+
+/* Bouton de fermeture, en haut à droite DU CADRE (coin de la vidéo). */
+.tuto__fermer {
+  position: absolute;
+  top: var(--esp-2);
+  right: var(--esp-2);
+  z-index: 1; /* au-dessus de la vidéo */
+  width: 36px;
+  height: 36px;
+  border-radius: 999px; /* rond */
+  background: rgba(14, 17, 22, 0.85); /* fond sombre lisible par-dessus l'image */
+  border: 1px solid var(--bordure);
+  color: var(--texte);
+  font-size: 1rem;
+  line-height: 1;
+}
+.tuto__fermer:hover {
+  background: var(--surface-2);
+}
